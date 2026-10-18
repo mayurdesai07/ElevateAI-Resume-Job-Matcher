@@ -2,7 +2,22 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { ChatMessage, ResumeProfile, JobMatch, OneSkillUnlock, CareerBlueprint } from "@/types";
-import { MessageSquareCode, Sparkles, X, Send, Bot, User, RefreshCw, ChevronRight } from "lucide-react";
+import {
+  MessageSquareCode,
+  Sparkles,
+  X,
+  Send,
+  Bot,
+  User,
+  RefreshCw,
+  ChevronRight,
+  Mic,
+  MicOff,
+  Volume2,
+  VolumeX,
+  Radio
+} from "lucide-react";
+import { useVoiceCoach } from "@/lib/useVoiceCoach";
 
 interface AiCareerCoachDrawerProps {
   isOpen: boolean;
@@ -27,7 +42,7 @@ export function AiCareerCoachDrawer({
     {
       id: "welcome",
       role: "assistant",
-      content: `👋 Hi **${profile.name}**! I'm **Aria**, your AI Career Coach & Talent Architect.\n\nI have complete context of your resume (**${profile.title}**), your **${jobMatches.length} job matches**, and your **One-Skill Unlock recommendations**.\n\nHow can I help you elevate your career today?`,
+      content: `👋 Hi **${profile.name}**! I'm **Aria**, your AI Career Coach & Talent Architect.\n\n🎙️ **Voice AI is enabled!** Click the microphone button below to speak directly with me, or type any question.\n\nI have complete context of your resume (**${profile.title}**), your **${jobMatches.length} job matches**, and your **One-Skill Unlock recommendations**.`,
       timestamp: "Just now",
       suggestedPrompts: [
         "Why am I missing out on Senior roles right now?",
@@ -40,12 +55,40 @@ export function AiCareerCoachDrawer({
 
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [currentlySpeakingId, setCurrentlySpeakingId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  // Voice AI Hook
+  const {
+    isListening,
+    isSpeaking,
+    hasSupport,
+    voiceMode,
+    setVoiceMode,
+    transcript,
+    startListening,
+    stopListening,
+    speakText,
+    stopSpeaking,
+  } = useVoiceCoach((recognizedText) => {
+    // When final speech is recognized, populate input or auto-send
+    if (recognizedText) {
+      setInput(recognizedText);
+      handleSendMessage(recognizedText);
+    }
+  });
+
+  // Keep input updated with live interim transcript while listening
+  useEffect(() => {
+    if (isListening && transcript) {
+      setInput(transcript);
+    }
+  }, [isListening, transcript]);
 
   // Auto scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isLoading]);
+  }, [messages, isLoading, isListening]);
 
   // Handle initial external prompt injection
   useEffect(() => {
@@ -57,6 +100,11 @@ export function AiCareerCoachDrawer({
   const handleSendMessage = async (textToSend?: string) => {
     const query = textToSend || input;
     if (!query.trim() || isLoading) return;
+
+    if (isSpeaking) {
+      stopSpeaking();
+      setCurrentlySpeakingId(null);
+    }
 
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
@@ -85,10 +133,12 @@ export function AiCareerCoachDrawer({
       });
 
       const data = await res.json();
+      const replyText = data.reply || "I reviewed your resume and am ready to guide your next steps.";
+
       const assistantMessage: ChatMessage = {
         id: `assistant-${Date.now()}`,
         role: "assistant",
-        content: data.reply || "I encountered an issue processing your request. Please try again.",
+        content: replyText,
         timestamp: "Just now",
         suggestedPrompts: [
           "Break down week 1 in detail",
@@ -98,6 +148,12 @@ export function AiCareerCoachDrawer({
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+
+      // If voice mode is enabled, auto-speak Aria's response!
+      if (voiceMode) {
+        setCurrentlySpeakingId(assistantMessage.id);
+        speakText(replyText);
+      }
     } catch (err) {
       console.error("AI Coach error:", err);
       setMessages((prev) => [
@@ -114,6 +170,16 @@ export function AiCareerCoachDrawer({
     }
   };
 
+  const toggleSpeechForMessage = (message: ChatMessage) => {
+    if (isSpeaking && currentlySpeakingId === message.id) {
+      stopSpeaking();
+      setCurrentlySpeakingId(null);
+    } else {
+      setCurrentlySpeakingId(message.id);
+      speakText(message.content);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -127,31 +193,72 @@ export function AiCareerCoachDrawer({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-white text-sm">Aria — AI Career Coach</h3>
+                <h3 className="font-bold text-white text-sm">Aria — Voice & Chat Coach</h3>
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               </div>
               <p className="text-[11px] text-slate-400">Context: {profile.title} · {profile.name}</p>
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Voice Mode Toggle Switch */}
+            <button
+              onClick={() => {
+                const next = !voiceMode;
+                setVoiceMode(next);
+                if (!next && isSpeaking) stopSpeaking();
+              }}
+              title={voiceMode ? "Voice Auto-Read ON" : "Voice Auto-Read OFF"}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all border ${
+                voiceMode
+                  ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-glow"
+                  : "bg-slate-800/60 text-slate-400 border-slate-700/60 hover:text-slate-200"
+              }`}
+            >
+              <Radio className={`w-3.5 h-3.5 ${voiceMode ? "text-emerald-400 animate-pulse" : ""}`} />
+              <span>Voice Mode: {voiceMode ? "ON" : "OFF"}</span>
+            </button>
+
+            <button
+              onClick={() => {
+                if (isSpeaking) stopSpeaking();
+                if (isListening) stopListening();
+                onClose();
+              }}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
-        {/* Context bar */}
-        <div className="px-4 py-2 bg-slate-950/80 border-b border-slate-800/80 text-[11px] text-slate-400 flex items-center gap-2 overflow-x-auto whitespace-nowrap">
-          <span className="font-semibold text-slate-300">Active Focus:</span>
-          <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            {profile.name}
-          </span>
-          {activeBlueprint && (
-            <span className="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-              Track: {activeBlueprint.title}
+        {/* Live Audio Visualizer / Context Banner */}
+        <div className="px-4 py-2 bg-slate-950/80 border-b border-slate-800/80 text-[11px] flex items-center justify-between">
+          <div className="flex items-center gap-2 overflow-x-auto whitespace-nowrap text-slate-400">
+            <span className="font-semibold text-slate-300">Active Focus:</span>
+            <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              {profile.name}
             </span>
+            {activeBlueprint && (
+              <span className="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                Track: {activeBlueprint.title}
+              </span>
+            )}
+          </div>
+
+          {/* Voice status indicator */}
+          {isListening && (
+            <div className="flex items-center gap-1.5 text-rose-400 font-bold animate-pulse text-[11px]">
+              <span className="w-2 h-2 rounded-full bg-rose-500" />
+              <span>Listening to you...</span>
+            </div>
+          )}
+
+          {isSpeaking && (
+            <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-[11px]">
+              <Volume2 className="w-3.5 h-3.5 animate-bounce" />
+              <span>Aria Speaking...</span>
+            </div>
           )}
         </div>
 
@@ -171,12 +278,27 @@ export function AiCareerCoachDrawer({
               )}
 
               <div
-                className={`p-3.5 rounded-2xl max-w-[85%] leading-relaxed ${
+                className={`p-3.5 rounded-2xl max-w-[85%] leading-relaxed relative group ${
                   m.role === "user"
                     ? "bg-emerald-500 text-obsidian-950 font-medium rounded-tr-none shadow-glow"
                     : "bg-obsidian-900 border border-slate-800 text-slate-200 rounded-tl-none whitespace-pre-wrap"
                 }`}
               >
+                {/* Text-to-speech speaker button on assistant message */}
+                {m.role === "assistant" && (
+                  <button
+                    onClick={() => toggleSpeechForMessage(m)}
+                    title={isSpeaking && currentlySpeakingId === m.id ? "Stop voice" : "Read aloud"}
+                    className="absolute top-2.5 right-2.5 p-1 rounded-md text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 transition-colors"
+                  >
+                    {isSpeaking && currentlySpeakingId === m.id ? (
+                      <VolumeX className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
+                    ) : (
+                      <Volume2 className="w-3.5 h-3.5 text-slate-400 hover:text-emerald-400" />
+                    )}
+                  </button>
+                )}
+
                 {m.content}
 
                 {/* Suggested Prompt Chips */}
@@ -212,14 +334,14 @@ export function AiCareerCoachDrawer({
               <div className="w-7 h-7 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
                 <RefreshCw className="w-4 h-4 animate-spin" />
               </div>
-              <span>Aria is thinking & synthesizing your resume data...</span>
+              <span>Aria is thinking & synthesizing your voice input...</span>
             </div>
           )}
 
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Bar */}
+        {/* Input Bar with Voice Microphone */}
         <div className="p-3 border-t border-slate-800 bg-obsidian-900">
           <form
             onSubmit={(e) => {
@@ -228,13 +350,49 @@ export function AiCareerCoachDrawer({
             }}
             className="flex items-center gap-2"
           >
+            {/* Microphone Button */}
+            <button
+              type="button"
+              onClick={() => {
+                if (isListening) {
+                  stopListening();
+                } else {
+                  startListening();
+                }
+              }}
+              title={isListening ? "Stop listening" : "Click to speak with Aria"}
+              className={`p-2.5 rounded-xl border transition-all flex items-center justify-center relative ${
+                isListening
+                  ? "bg-rose-500/20 border-rose-500 text-rose-400 shadow-glow animate-pulse"
+                  : "bg-slate-800/80 hover:bg-slate-800 border-slate-700 text-slate-300 hover:text-emerald-400 hover:border-emerald-500/40"
+              }`}
+            >
+              {isListening ? (
+                <>
+                  <Mic className="w-4 h-4 text-rose-400" />
+                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
+                </>
+              ) : (
+                <Mic className="w-4 h-4" />
+              )}
+            </button>
+
             <input
               type="text"
-              placeholder="Ask Aria anything about your career, study plan, or resume..."
+              placeholder={
+                isListening
+                  ? "Listening to your voice... Speak now!"
+                  : "Ask Aria or click the mic to speak..."
+              }
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              className="flex-1 px-3.5 py-2.5 text-xs rounded-xl bg-obsidian-950 border border-slate-700/80 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+              className={`flex-1 px-3.5 py-2.5 text-xs rounded-xl bg-obsidian-950 border transition-all text-white placeholder-slate-500 focus:outline-none ${
+                isListening
+                  ? "border-rose-500 bg-rose-950/20 text-rose-200"
+                  : "border-slate-700/80 focus:border-emerald-500"
+              }`}
             />
+
             <button
               type="submit"
               disabled={!input.trim() || isLoading}
@@ -243,6 +401,12 @@ export function AiCareerCoachDrawer({
               <Send className="w-4 h-4" />
             </button>
           </form>
+
+          {/* Quick voice hint */}
+          <div className="mt-2 flex items-center justify-between text-[10px] text-slate-400 px-1">
+            <span>💡 Click the mic & say: "Why am I missing out on Senior roles?"</span>
+            {isListening && <span className="text-rose-400 font-semibold">🎙️ Audio Recording Active</span>}
+          </div>
         </div>
       </div>
     </div>

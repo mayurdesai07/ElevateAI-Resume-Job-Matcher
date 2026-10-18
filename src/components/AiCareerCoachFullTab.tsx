@@ -14,8 +14,15 @@ import {
   TrendingUp,
   Brain,
   FileText,
-  DollarSign
+  DollarSign,
+  Mic,
+  MicOff,
+  Volume2,
+  VolumeX,
+  Radio,
+  AudioWaveform
 } from "lucide-react";
+import { useVoiceCoach } from "@/lib/useVoiceCoach";
 
 interface AiCareerCoachFullTabProps {
   profile: ResumeProfile;
@@ -36,15 +43,17 @@ export function AiCareerCoachFullTab({
     {
       id: "welcome",
       role: "assistant",
-      content: `### 🎯 Welcome to your Dedicated AI Career Coaching Studio!
+      content: `### 🎯 Welcome to your Voice-Enabled AI Career Studio!
 
-I'm **Aria**, an autonomous Career Strategist and Talent Intelligence Agent. I have full context of:
-- **Your Profile:** ${profile.name} (${profile.title}, ~${profile.yearsOfExperience} yrs exp)
+I'm **Aria**, an autonomous Career Strategist and Voice Coach. You can talk to me directly using your microphone or type your questions!
+
+**Active Context:**
+- **Candidate:** ${profile.name} (${profile.title}, ~${profile.yearsOfExperience} yrs exp)
 - **Top Match:** ${jobMatches[0]?.title} at ${jobMatches[0]?.company} (${jobMatches[0]?.matchScore}% Fit)
 - **Primary 1-Skill Unlock:** ${oneSkillUnlocks[0]?.targetRole} (+${oneSkillUnlocks[0]?.salaryBoostPercent}% salary boost)
 ${activeBlueprint ? `- **Target Blueprint:** ${activeBlueprint.title} (${activeBlueprint.averageSalaryUsd})` : ""}
 
-Click any quick question below or ask me anything custom!`,
+Click the **Microphone** below to speak, or pick any starter question!`,
       timestamp: "Just now",
       suggestedPrompts: [
         "Why am I missing out on Senior roles right now?",
@@ -58,11 +67,39 @@ Click any quick question below or ask me anything custom!`,
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [currentlySpeakingId, setCurrentlySpeakingId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  // Voice AI Hook
+  const {
+    isListening,
+    isSpeaking,
+    hasSupport,
+    voiceMode,
+    setVoiceMode,
+    transcript,
+    audioLevel,
+    startListening,
+    stopListening,
+    speakText,
+    stopSpeaking,
+  } = useVoiceCoach((recognizedText) => {
+    if (recognizedText) {
+      setInput(recognizedText);
+      handleSendMessage(recognizedText);
+    }
+  });
+
+  // Keep input updated with live interim speech while listening
+  useEffect(() => {
+    if (isListening && transcript) {
+      setInput(transcript);
+    }
+  }, [isListening, transcript]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isLoading]);
+  }, [messages, isLoading, isListening]);
 
   useEffect(() => {
     if (initialPrompt && initialPrompt.trim()) {
@@ -73,6 +110,11 @@ Click any quick question below or ask me anything custom!`,
   const handleSendMessage = async (queryText?: string) => {
     const text = queryText || input;
     if (!text.trim() || isLoading) return;
+
+    if (isSpeaking) {
+      stopSpeaking();
+      setCurrentlySpeakingId(null);
+    }
 
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
@@ -101,10 +143,12 @@ Click any quick question below or ask me anything custom!`,
       });
 
       const data = await res.json();
+      const replyContent = data.reply || "Let me analyze your background and guide you.";
+
       const assistantMessage: ChatMessage = {
         id: `assistant-${Date.now()}`,
         role: "assistant",
-        content: data.reply || "Let me analyze your background and guide you.",
+        content: replyContent,
         timestamp: "Just now",
         suggestedPrompts: [
           "Create a day-by-day checklist for Week 1",
@@ -114,6 +158,12 @@ Click any quick question below or ask me anything custom!`,
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+
+      // If voice mode is enabled, auto-speak Aria's response
+      if (voiceMode) {
+        setCurrentlySpeakingId(assistantMessage.id);
+        speakText(replyContent);
+      }
     } catch (err) {
       console.error("AI Coach API error:", err);
       setMessages((prev) => [
@@ -136,10 +186,62 @@ Click any quick question below or ask me anything custom!`,
     setTimeout(() => setCopiedId(null), 2500);
   };
 
+  const toggleSpeechForMessage = (message: ChatMessage) => {
+    if (isSpeaking && currentlySpeakingId === message.id) {
+      stopSpeaking();
+      setCurrentlySpeakingId(null);
+    } else {
+      setCurrentlySpeakingId(message.id);
+      speakText(message.content);
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-      {/* Left Sidebar: Active Context & Quick Jump Prompts */}
+      {/* Left Sidebar: Active Context & Voice Controls */}
       <div className="lg:col-span-1 space-y-4">
+        {/* Voice AI Control Card */}
+        <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-obsidian-900 to-obsidian-900 border border-indigo-500/30 shadow-glass">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-indigo-300">
+              <Radio className={`w-4 h-4 ${voiceMode ? "text-emerald-400 animate-pulse" : "text-indigo-400"}`} />
+              <span>Voice Conversation</span>
+            </div>
+            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${voiceMode ? "bg-emerald-500/20 text-emerald-400" : "bg-slate-800 text-slate-400"}`}>
+              {voiceMode ? "AUTO-VOICE ON" : "MUTED"}
+            </span>
+          </div>
+
+          <p className="text-xs text-slate-300 leading-relaxed">
+            Talk directly to Aria. Toggle auto-voice to have her speak all responses out loud.
+          </p>
+
+          <button
+            onClick={() => {
+              const next = !voiceMode;
+              setVoiceMode(next);
+              if (!next && isSpeaking) stopSpeaking();
+            }}
+            className={`mt-3 w-full py-2 px-3 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-2 ${
+              voiceMode
+                ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-glow"
+                : "bg-slate-800/80 hover:bg-slate-700 text-slate-300 border-slate-700"
+            }`}
+          >
+            {voiceMode ? (
+              <>
+                <Volume2 className="w-4 h-4 text-emerald-400" />
+                <span>Auto-Read Responses: ACTIVE</span>
+              </>
+            ) : (
+              <>
+                <VolumeX className="w-4 h-4 text-slate-400" />
+                <span>Enable Voice Auto-Read</span>
+              </>
+            )}
+          </button>
+        </div>
+
         {/* Active Context Card */}
         <div className="p-4 rounded-2xl bg-obsidian-900 border border-slate-800 shadow-glass">
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
@@ -208,16 +310,31 @@ Click any quick question below or ask me anything custom!`,
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-white text-sm">Aria — Strategic Career Coach</h3>
+                <h3 className="font-bold text-white text-sm">Aria — Voice Career Strategist</h3>
                 <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
-                  ACTIVE
+                  VOICE ACTIVE
                 </span>
               </div>
               <p className="text-[11px] text-slate-400">
-                Ready to answer anything about your career path, resume, or salary negotiations
+                Ask by voice or text. Get tailored career schedules, resume rewrites, and interview advice.
               </p>
             </div>
           </div>
+
+          {/* Audio State Banner */}
+          {isSpeaking && (
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold animate-pulse">
+              <Volume2 className="w-4 h-4" />
+              <span>Aria Speaking...</span>
+            </div>
+          )}
+
+          {isListening && (
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-semibold animate-pulse">
+              <Mic className="w-4 h-4" />
+              <span>Listening to Voice...</span>
+            </div>
+          )}
         </div>
 
         {/* Message Log */}
@@ -242,18 +359,33 @@ Click any quick question below or ask me anything custom!`,
                     : "bg-obsidian-950 border border-slate-800 text-slate-200 rounded-tl-none whitespace-pre-wrap"
                 }`}
               >
-                {/* Copy response button */}
+                {/* Action buttons (Copy + Speak) */}
                 {m.role === "assistant" && (
-                  <button
-                    onClick={() => copyToClipboard(m.content, m.id)}
-                    className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white"
-                  >
-                    {copiedId === m.id ? (
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
-                    ) : (
-                      <Copy className="w-3.5 h-3.5" />
-                    )}
-                  </button>
+                  <div className="absolute top-3 right-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => toggleSpeechForMessage(m)}
+                      title={isSpeaking && currentlySpeakingId === m.id ? "Stop voice" : "Read aloud"}
+                      className="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white"
+                    >
+                      {isSpeaking && currentlySpeakingId === m.id ? (
+                        <VolumeX className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
+                      ) : (
+                        <Volume2 className="w-3.5 h-3.5 hover:text-emerald-400" />
+                      )}
+                    </button>
+
+                    <button
+                      onClick={() => copyToClipboard(m.content, m.id)}
+                      title="Copy text"
+                      className="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white"
+                    >
+                      {copiedId === m.id ? (
+                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      ) : (
+                        <Copy className="w-3.5 h-3.5" />
+                      )}
+                    </button>
+                  </div>
                 )}
 
                 {m.content}
@@ -287,14 +419,14 @@ Click any quick question below or ask me anything custom!`,
               <div className="w-8 h-8 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
                 <RefreshCw className="w-4 h-4 animate-spin" />
               </div>
-              <span>Aria is analyzing your career profile and formulating recommendations...</span>
+              <span>Aria is analyzing your voice prompt and career data...</span>
             </div>
           )}
 
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Form */}
+        {/* Input Form with Microphone Button */}
         <div className="p-4 border-t border-slate-800 bg-obsidian-950 rounded-b-2xl">
           <form
             onSubmit={(e) => {
@@ -303,13 +435,49 @@ Click any quick question below or ask me anything custom!`,
             }}
             className="flex items-center gap-3"
           >
+            {/* Microphone Voice Button */}
+            <button
+              type="button"
+              onClick={() => {
+                if (isListening) {
+                  stopListening();
+                } else {
+                  startListening();
+                }
+              }}
+              title={isListening ? "Stop listening" : "Click to speak with Aria"}
+              className={`p-3 rounded-xl border transition-all flex items-center justify-center relative ${
+                isListening
+                  ? "bg-rose-500/20 border-rose-500 text-rose-400 shadow-glow animate-pulse"
+                  : "bg-obsidian-900 hover:bg-slate-800 border-slate-700 text-slate-300 hover:text-emerald-400 hover:border-emerald-500/40"
+              }`}
+            >
+              {isListening ? (
+                <>
+                  <Mic className="w-5 h-5 text-rose-400" />
+                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
+                </>
+              ) : (
+                <Mic className="w-5 h-5" />
+              )}
+            </button>
+
             <input
               type="text"
-              placeholder="Ask Aria anything (e.g. 'How do I become a Senior Data Analyst in 3 months?')..."
+              placeholder={
+                isListening
+                  ? "Listening to your voice... Speak your question now!"
+                  : "Ask Aria anything, or click the mic to speak..."
+              }
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              className="flex-1 px-4 py-3 text-xs rounded-xl bg-obsidian-900 border border-slate-700/80 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+              className={`flex-1 px-4 py-3 text-xs rounded-xl bg-obsidian-900 border transition-all text-white placeholder-slate-500 focus:outline-none ${
+                isListening
+                  ? "border-rose-500 bg-rose-950/20 text-rose-200"
+                  : "border-slate-700/80 focus:border-emerald-500"
+              }`}
             />
+
             <button
               type="submit"
               disabled={!input.trim() || isLoading}
@@ -319,6 +487,12 @@ Click any quick question below or ask me anything custom!`,
               <Send className="w-4 h-4" />
             </button>
           </form>
+
+          {/* Helpful voice hint */}
+          <div className="mt-2.5 flex items-center justify-between text-[11px] text-slate-400 px-1">
+            <span>🎙️ **Voice AI Ready**: Click the mic and speak naturally. Aria understands speech directly.</span>
+            {isListening && <span className="text-rose-400 font-bold animate-pulse">● Live Recording</span>}
+          </div>
         </div>
       </div>
     </div>
