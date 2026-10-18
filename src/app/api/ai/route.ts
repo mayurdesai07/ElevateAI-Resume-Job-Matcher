@@ -62,7 +62,13 @@ Instructions:
         : process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 
     if (geminiKey) {
-      const models = ["gemini-1.5-flash", "gemini-2.0-flash", "gemini-1.5-pro"];
+      const models = [
+        "gemini-3.8-flash",
+        "gemini-3.5-flash",
+        "gemini-2.5-pro",
+        "gemini-flash-latest",
+        "gemini-1.5-flash",
+      ];
       for (const model of models) {
         try {
           const geminiRes = await fetch(
