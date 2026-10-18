@@ -1,6 +1,6 @@
 # ElevateAI — Intelligent Resume Job Matcher & Pipeline
 
-🚀 **Live Production Site:** [https://elevate-ai-career.vercel.app](https://elevate-ai-career.vercel.app)
+🚀 **Live Production Site:** [https://elevate-your-career.vercel.app](https://elevate-your-career.vercel.app)
 
 ---
 
@@ -25,4 +25,4 @@
 - **Framework:** Next.js 14 (App Router)
 - **Styling:** Tailwind CSS + Lucide Icons
 - **Edge Firewall:** Next.js Edge Middleware (`src/middleware.ts`)
-- **Deployment:** Vercel Global Edge Network ([https://elevate-ai-career.vercel.app](https://elevate-ai-career.vercel.app))
+- **Deployment:** Vercel Global Edge Network ([https://elevate-your-career.vercel.app](https://elevate-your-career.vercel.app))
