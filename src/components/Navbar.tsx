@@ -1,12 +1,13 @@
 "use client";
 
 import React from "react";
-import { Sparkles, Compass, Briefcase, Zap, MessageSquareCode, ExternalLink } from "lucide-react";
+import { Sparkles, Compass, Briefcase, Zap, MessageSquareCode, ExternalLink, KeyRound } from "lucide-react";
 
 interface NavbarProps {
   activeTab: "jobs" | "unlocks" | "roadmaps" | "ai";
   setActiveTab: (tab: "jobs" | "unlocks" | "roadmaps" | "ai") => void;
   onOpenAiDrawer: () => void;
+  onOpenKeyModal: () => void;
   matchesCount: number;
   unlocksCount: number;
 }
@@ -15,6 +16,7 @@ export function Navbar({
   activeTab,
   setActiveTab,
   onOpenAiDrawer,
+  onOpenKeyModal,
   matchesCount,
   unlocksCount,
 }: NavbarProps) {
@@ -98,8 +100,16 @@ export function Navbar({
           </button>
         </nav>
 
-        {/* Right Action: Quick AI Drawer Trigger */}
-        <div className="flex items-center gap-2.5">
+        {/* Right Action: Quick AI Drawer Trigger & API Key Settings */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onOpenKeyModal}
+            title="Configure AI Models & API Keys (Gemini, OpenAI, etc.)"
+            className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-cyan-300 border border-slate-700/80 transition-colors"
+          >
+            <KeyRound className="w-4 h-4" />
+          </button>
+
           <button
             onClick={onOpenAiDrawer}
             className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-emerald-500/10 via-indigo-500/10 to-emerald-500/10 border border-emerald-500/30 text-emerald-300 hover:border-emerald-400/60 transition-all shadow-glow hover:shadow-emerald-500/20"

@@ -14,6 +14,7 @@ import { OneSkillUnlockTab } from "@/components/OneSkillUnlockTab";
 import { CareerExplorerTab } from "@/components/CareerExplorerTab";
 import { AiCareerCoachFullTab } from "@/components/AiCareerCoachFullTab";
 import { AiCareerCoachDrawer } from "@/components/AiCareerCoachDrawer";
+import { ApiKeyModal } from "@/components/ApiKeyModal";
 import { Sparkles, ArrowUp } from "lucide-react";
 
 export default function Home() {
@@ -22,8 +23,9 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<"jobs" | "unlocks" | "roadmaps" | "ai">("jobs");
   const [activeBlueprintId, setActiveBlueprintId] = useState<string>("data-analyst");
 
-  // AI Drawer state
+  // AI Drawer & Key Modal state
   const [isAiDrawerOpen, setIsAiDrawerOpen] = useState(false);
+  const [isKeyModalOpen, setIsKeyModalOpen] = useState(false);
   const [injectedAiPrompt, setInjectedAiPrompt] = useState<string>("");
 
   // Dynamically compute matches and unlocks based on current active profile
@@ -46,6 +48,7 @@ export default function Home() {
           setInjectedAiPrompt("");
           setIsAiDrawerOpen(true);
         }}
+        onOpenKeyModal={() => setIsKeyModalOpen(true)}
         matchesCount={jobMatches.length}
         unlocksCount={oneSkillUnlocks.length}
       />
@@ -106,6 +109,12 @@ export default function Home() {
         oneSkillUnlocks={oneSkillUnlocks}
         activeBlueprint={activeBlueprint}
         initialPrompt={injectedAiPrompt}
+      />
+
+      {/* API Key & AI Engine Configuration Modal */}
+      <ApiKeyModal
+        isOpen={isKeyModalOpen}
+        onClose={() => setIsKeyModalOpen(false)}
       />
 
       {/* Persistent Floating AI Action Button (Bottom Right) */}

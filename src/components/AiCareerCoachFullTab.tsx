@@ -128,11 +128,18 @@ Click the **Microphone** below to speak, or pick any starter question!`,
     setIsLoading(true);
 
     try {
+      const storedGemini = typeof window !== "undefined" ? localStorage.getItem("elevate_gemini_key") : null;
+      const storedOpenAi = typeof window !== "undefined" ? localStorage.getItem("elevate_openai_key") : null;
+      const userApiKey = storedGemini || storedOpenAi || undefined;
+      const apiProvider = storedGemini ? "gemini" : (storedOpenAi ? "openai" : undefined);
+
       const res = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt: text,
+          userApiKey,
+          apiProvider,
           context: {
             profile,
             jobMatches,
