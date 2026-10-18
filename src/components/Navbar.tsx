@@ -15,7 +15,6 @@ import {
   LogOut,
   ChevronDown,
   ShieldCheck,
-  Shield,
 } from "lucide-react";
 import { UserAccount } from "@/types";
 
@@ -24,7 +23,6 @@ interface NavbarProps {
   setActiveTab: (tab: "jobs" | "unlocks" | "roadmaps" | "ai") => void;
   onOpenAiDrawer: () => void;
   onOpenKeyModal: () => void;
-  onOpenSecurityModal: () => void;
   onOpenTracker: () => void;
   onOpenComposioModal: () => void;
   currentUser: UserAccount | null;
@@ -40,7 +38,6 @@ export function Navbar({
   setActiveTab,
   onOpenAiDrawer,
   onOpenKeyModal,
-  onOpenSecurityModal,
   onOpenTracker,
   onOpenComposioModal,
   currentUser,
@@ -198,19 +195,6 @@ export function Navbar({
             className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-cyan-300 border border-slate-700/80 transition-colors"
           >
             <KeyRound className="w-4 h-4" />
-          </button>
-
-          {/* Firewall & Owner Security Shield Button */}
-          <button
-            onClick={onOpenSecurityModal}
-            title="Firewall Defense &amp; Owner Security Command Center"
-            className="p-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-all relative group"
-          >
-            <Shield className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
-            <span className="absolute -top-1 -right-1 flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
           </button>
 
           {/* Aria AI Coach Trigger */}
