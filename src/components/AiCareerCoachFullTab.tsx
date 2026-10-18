@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ChatMessage, ResumeProfile, JobMatch, OneSkillUnlock, CareerBlueprint } from "@/types";
 import {
-  MessageSquareCode,
   Sparkles,
   Send,
   Bot,
@@ -16,11 +15,9 @@ import {
   FileText,
   DollarSign,
   Mic,
-  MicOff,
   Volume2,
   VolumeX,
-  Radio,
-  AudioWaveform
+  AlertCircle
 } from "lucide-react";
 import { useVoiceCoach } from "@/lib/useVoiceCoach";
 
@@ -69,24 +66,24 @@ Click the **Microphone** below to speak, or pick any starter question!`,
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [currentlySpeakingId, setCurrentlySpeakingId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const usedVoiceRef = useRef<boolean>(false);
 
   // Voice AI Hook
   const {
     isListening,
     isSpeaking,
     hasSupport,
-    voiceMode,
-    setVoiceMode,
     transcript,
-    audioLevel,
+    voiceError,
     startListening,
     stopListening,
     speakText,
     stopSpeaking,
   } = useVoiceCoach((recognizedText) => {
-    if (recognizedText) {
-      setInput(recognizedText);
-      handleSendMessage(recognizedText);
+    if (recognizedText && recognizedText.trim()) {
+      setInput(recognizedText.trim());
+      usedVoiceRef.current = true;
+      handleSendMessage(recognizedText.trim());
     }
   });
 
@@ -110,6 +107,10 @@ Click the **Microphone** below to speak, or pick any starter question!`,
   const handleSendMessage = async (queryText?: string) => {
     const text = queryText || input;
     if (!text.trim() || isLoading) return;
+
+    if (isListening) {
+      stopListening();
+    }
 
     if (isSpeaking) {
       stopSpeaking();
@@ -166,10 +167,13 @@ Click the **Microphone** below to speak, or pick any starter question!`,
 
       setMessages((prev) => [...prev, assistantMessage]);
 
-      // If voice mode is enabled, auto-speak Aria's response
-      if (voiceMode) {
+      // Automatically speak Aria's response if user used the mic!
+      if (usedVoiceRef.current) {
         setCurrentlySpeakingId(assistantMessage.id);
-        speakText(replyContent);
+        speakText(replyContent, () => {
+          setCurrentlySpeakingId(null);
+          usedVoiceRef.current = false;
+        });
       }
     } catch (err) {
       console.error("AI Coach API error:", err);
@@ -187,6 +191,19 @@ Click the **Microphone** below to speak, or pick any starter question!`,
     }
   };
 
+  const handleMicToggle = async () => {
+    if (isListening) {
+      const recorded = stopListening();
+      if (recorded) {
+        usedVoiceRef.current = true;
+        handleSendMessage(recorded);
+      }
+    } else {
+      usedVoiceRef.current = true;
+      await startListening();
+    }
+  };
+
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
@@ -199,56 +216,16 @@ Click the **Microphone** below to speak, or pick any starter question!`,
       setCurrentlySpeakingId(null);
     } else {
       setCurrentlySpeakingId(message.id);
-      speakText(message.content);
+      speakText(message.content, () => {
+        setCurrentlySpeakingId(null);
+      });
     }
   };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-      {/* Left Sidebar: Active Context & Voice Controls */}
+      {/* Left Sidebar: Active Context & Quick Strategies */}
       <div className="lg:col-span-1 space-y-4">
-        {/* Voice AI Control Card */}
-        <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-950/40 via-obsidian-900 to-obsidian-900 border border-indigo-500/30 shadow-glass">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-indigo-300">
-              <Radio className={`w-4 h-4 ${voiceMode ? "text-emerald-400 animate-pulse" : "text-indigo-400"}`} />
-              <span>Voice Conversation</span>
-            </div>
-            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${voiceMode ? "bg-emerald-500/20 text-emerald-400" : "bg-slate-800 text-slate-400"}`}>
-              {voiceMode ? "AUTO-VOICE ON" : "MUTED"}
-            </span>
-          </div>
-
-          <p className="text-xs text-slate-300 leading-relaxed">
-            Talk directly to Aria. Toggle auto-voice to have her speak all responses out loud.
-          </p>
-
-          <button
-            onClick={() => {
-              const next = !voiceMode;
-              setVoiceMode(next);
-              if (!next && isSpeaking) stopSpeaking();
-            }}
-            className={`mt-3 w-full py-2 px-3 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-2 ${
-              voiceMode
-                ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-glow"
-                : "bg-slate-800/80 hover:bg-slate-700 text-slate-300 border-slate-700"
-            }`}
-          >
-            {voiceMode ? (
-              <>
-                <Volume2 className="w-4 h-4 text-emerald-400" />
-                <span>Auto-Read Responses: ACTIVE</span>
-              </>
-            ) : (
-              <>
-                <VolumeX className="w-4 h-4 text-slate-400" />
-                <span>Enable Voice Auto-Read</span>
-              </>
-            )}
-          </button>
-        </div>
-
         {/* Active Context Card */}
         <div className="p-4 rounded-2xl bg-obsidian-900 border border-slate-800 shadow-glass">
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
@@ -319,11 +296,11 @@ Click the **Microphone** below to speak, or pick any starter question!`,
               <div className="flex items-center gap-2">
                 <h3 className="font-bold text-white text-sm">Aria — Voice Career Strategist</h3>
                 <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
-                  VOICE ACTIVE
+                  READY
                 </span>
               </div>
               <p className="text-[11px] text-slate-400">
-                Ask by voice or text. Get tailored career schedules, resume rewrites, and interview advice.
+                Tap the microphone to talk with Aria, or type any career and interview question.
               </p>
             </div>
           </div>
@@ -331,18 +308,26 @@ Click the **Microphone** below to speak, or pick any starter question!`,
           {/* Audio State Banner */}
           {isSpeaking && (
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold animate-pulse">
-              <Volume2 className="w-4 h-4" />
+              <Volume2 className="w-4 h-4 animate-bounce" />
               <span>Aria Speaking...</span>
             </div>
           )}
 
           {isListening && (
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-semibold animate-pulse">
-              <Mic className="w-4 h-4" />
+              <Mic className="w-4 h-4 animate-bounce" />
               <span>Listening to Voice...</span>
             </div>
           )}
         </div>
+
+        {/* Error notification if mic access was blocked */}
+        {voiceError && (
+          <div className="p-3 bg-rose-950/40 border-b border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+            <span className="flex-1">{voiceError}</span>
+          </div>
+        )}
 
         {/* Message Log */}
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
@@ -433,7 +418,7 @@ Click the **Microphone** below to speak, or pick any starter question!`,
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Form with Microphone Button */}
+        {/* Input Form with 1-Click Microphone Button */}
         <div className="p-4 border-t border-slate-800 bg-obsidian-950 rounded-b-2xl">
           <form
             onSubmit={(e) => {
@@ -445,27 +430,17 @@ Click the **Microphone** below to speak, or pick any starter question!`,
             {/* Microphone Voice Button */}
             <button
               type="button"
-              onClick={() => {
-                if (isListening) {
-                  stopListening();
-                } else {
-                  startListening();
-                }
-              }}
-              title={isListening ? "Stop listening" : "Click to speak with Aria"}
+              onClick={handleMicToggle}
+              title={isListening ? "Stop and send voice message" : "Click to speak with Aria"}
               className={`p-3 rounded-xl border transition-all flex items-center justify-center relative ${
                 isListening
-                  ? "bg-rose-500/20 border-rose-500 text-rose-400 shadow-glow animate-pulse"
+                  ? "bg-rose-500 text-white border-rose-400 shadow-glow animate-pulse scale-105"
                   : "bg-obsidian-900 hover:bg-slate-800 border-slate-700 text-slate-300 hover:text-emerald-400 hover:border-emerald-500/40"
               }`}
             >
-              {isListening ? (
-                <>
-                  <Mic className="w-5 h-5 text-rose-400" />
-                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
-                </>
-              ) : (
-                <Mic className="w-5 h-5" />
+              <Mic className={`w-5 h-5 ${isListening ? "animate-bounce" : ""}`} />
+              {isListening && (
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-400 animate-ping" />
               )}
             </button>
 
@@ -473,8 +448,8 @@ Click the **Microphone** below to speak, or pick any starter question!`,
               type="text"
               placeholder={
                 isListening
-                  ? "Listening to your voice... Speak your question now!"
-                  : "Ask Aria anything, or click the mic to speak..."
+                  ? "Listening to your voice... Speak now! Tap mic or press Enter when done"
+                  : "Click mic to speak, or type your question..."
               }
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -495,10 +470,15 @@ Click the **Microphone** below to speak, or pick any starter question!`,
             </button>
           </form>
 
-          {/* Helpful voice hint */}
+          {/* Clean voice status hint */}
           <div className="mt-2.5 flex items-center justify-between text-[11px] text-slate-400 px-1">
-            <span>🎙️ **Voice AI Ready**: Click the mic and speak naturally. Aria understands speech directly.</span>
-            {isListening && <span className="text-rose-400 font-bold animate-pulse">● Live Recording</span>}
+            <span>
+              {isListening ? (
+                <strong className="text-rose-400">🎙️ Live Recording: Speak now, then tap mic or send</strong>
+              ) : (
+                "🎙️ 1-Click Voice AI: Click the mic and speak naturally. Aria transcribes and speaks back to you."
+              )}
+            </span>
           </div>
         </div>
       </div>
