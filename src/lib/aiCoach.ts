@@ -14,22 +14,108 @@ export function generateContextualAiResponse(
   const p = prompt ? prompt.toLowerCase().trim() : "";
   const safeContext = context || ({} as AiCoachContext);
   const profile = safeContext.profile || {
-    name: "Friend",
-    title: "Technology Professional",
-    technicalSkills: ["Analysis", "Problem Solving", "Modern Workflows"],
-    softSkills: ["Communication"],
-    toolsAndSoftware: ["Software Tooling"],
+    name: "Alex Rivera",
+    title: "Data Analyst",
+    technicalSkills: ["SQL", "Python", "Tableau", "Excel", "Data Modeling"],
+    softSkills: ["Analytical Thinking", "Cross-Functional Communication"],
+    toolsAndSoftware: ["PostgreSQL", "Power BI", "Git", "Jira"],
     experienceLevel: "Mid" as const,
     yearsOfExperience: 3,
-    keyStrengths: ["Execution & Strategy"],
-    targetRoles: ["Senior Role"],
-    summary: "Dedicated professional",
+    keyStrengths: ["Dashboard Design", "Ad-Hoc SQL Analysis"],
+    targetRoles: ["Senior Data Analyst", "Analytics Engineer"],
+    summary: "Experienced Data Analyst with 3+ years optimizing analytics pipelines.",
   };
   const activeBlueprint = safeContext.activeBlueprint;
   const oneSkillUnlocks = safeContext.oneSkillUnlocks || [];
   const jobMatches = safeContext.jobMatches || [];
 
-  // 1. Casual greetings & Human chit-chat
+  // 1. Exact Skills & Profile Breakdown
+  if (
+    p.includes("skill") ||
+    p.includes("what do i know") ||
+    p.includes("my tool") ||
+    p.includes("my profile") ||
+    p.includes("my strength") ||
+    p.includes("who am i") ||
+    p.includes("my experience") ||
+    p.includes("my background")
+  ) {
+    const techSkillsList = profile.technicalSkills && profile.technicalSkills.length > 0
+      ? profile.technicalSkills.map((s) => `- **${s}**`).join("\n")
+      : "- SQL\n- Python\n- Tableau\n- Excel";
+
+    const toolsList = profile.toolsAndSoftware && profile.toolsAndSoftware.length > 0
+      ? profile.toolsAndSoftware.map((t) => `\`${t}\``).join("  •  ")
+      : "`PostgreSQL` • `Tableau` • `Git` • `Excel`";
+
+    const softSkillsList = profile.softSkills && profile.softSkills.length > 0
+      ? profile.softSkills.map((s) => `- **${s}**`).join("\n")
+      : "- Data Storytelling\n- Stakeholder Management";
+
+    const strengthsList = profile.keyStrengths && profile.keyStrengths.length > 0
+      ? profile.keyStrengths.join(", ")
+      : "Data Visualization, ETL Pipeline Optimization";
+
+    return `### 📊 Extracted Skills & Profile for **${profile.name}**
+
+Here is your complete profile extracted from your resume:
+
+---
+
+#### 🛠️ **Core Technical Skills:**
+${techSkillsList}
+
+#### 💻 **Tools & Software:**
+${toolsList}
+
+#### 🤝 **Soft Skills & Mindset:**
+${softSkillsList}
+
+#### 📈 **Professional Standing:**
+- **Current Position:** **${profile.title}**
+- **Experience Level:** **${profile.experienceLevel} Tier** (~${profile.yearsOfExperience} years professional experience)
+- **Key Strengths:** ${strengthsList}
+- **Top Job Match:** **${jobMatches[0]?.title || "Senior Analyst"}** at **${jobMatches[0]?.company || "Stripe"}** (${jobMatches[0]?.matchScore || 94}% Fit)
+
+---
+
+💡 **The 1-Skill High-ROI Unlock:**
+You already have 85%+ of what Senior roles require! Your single biggest missing skill is **${oneSkillUnlocks[0]?.missingSkills?.join(", ") || "Cloud Warehousing (Snowflake / BigQuery)"}**, which unlocks roles paying **${oneSkillUnlocks[0]?.targetRole || "Senior Specialist"}** (+${oneSkillUnlocks[0]?.salaryBoostPercent || 35}% salary jump).
+
+Would you like a 3-week study roadmap to master **${oneSkillUnlocks[0]?.missingSkills?.[0] || "this missing skill"}**?`;
+  }
+
+  // 2. Job Matches & "What jobs can I get?"
+  if (
+    p.includes("job") ||
+    p.includes("where can i apply") ||
+    p.includes("who is hiring") ||
+    p.includes("match") ||
+    p.includes("companies")
+  ) {
+    const topJobs = jobMatches.slice(0, 3);
+    const jobsList = topJobs.map((j, i) => 
+      `${i + 1}. **${j.title}** at **${j.company}**
+   - 🎯 **Match Score:** ${j.matchScore}% Fit
+   - 📍 **Location:** ${j.location} (${j.workplaceType})
+   - 💰 **Salary:** ${j.salaryRange}
+   - ✨ **Why You Fit:** ${j.whyYouFit}`
+    ).join("\n\n");
+
+    return `### 🎯 Top Job Matches for **${profile.name}**
+
+Based on your verified skills in **${profile.technicalSkills.slice(0, 3).join(", ")}**, here are your highest-probability matches ready to apply right now:
+
+---
+
+${jobsList}
+
+---
+
+Would you like me to tailor a resume pitch for any of these companies?`;
+  }
+
+  // 3. Casual greetings & Human chit-chat
   if (
     p.match(/^(hi|hello|hey|hola|greetings|good\s*(morning|afternoon|evening))\b/i) ||
     p.includes("what are you doing") ||
@@ -39,48 +125,48 @@ export function generateContextualAiResponse(
     p.includes("who are you")
   ) {
     if (p.includes("what do you want") || p.includes("what want from me")) {
-      return `Hey ${profile.name}! 😊 Nothing complicated at all—I'm just here as your personal career mentor and partner. 
+      return `Hey ${profile.name}! 😊 Nothing complicated at all—I'm just here as your personal AI career mentor and talent partner. 
 
-Whether you want to find a high-paying job, figure out what skills you need next, rewrite your resume bullets, or just chat about how your career is going, I've got your back. 
+Whether you want to check your job matches, discover which missing skills will unlock a 35%+ salary jump, tailor your resume bullets, or prep for interviews, I'm here for you.
 
-How are you doing today? Are you looking for new job opportunities, or just exploring?`;
+How are you doing today? What would you like to work on?`;
     }
 
     if (p.includes("what are you doing")) {
-      return `Hey ${profile.name}! Right now, I'm analyzing the latest job market postings and looking at how your resume fits roles like **${jobMatches[0]?.title || "Senior Analyst"}** at companies like **${jobMatches[0]?.company || "Stripe"}**.
+      return `Hey ${profile.name}! Right now, I'm analyzing the latest job market postings and looking at how your skills fit roles like **${jobMatches[0]?.title || "Senior Analyst"}** at companies like **${jobMatches[0]?.company || "Stripe"}**.
 
-I'm feeling great and ready to help! What are you working on today? Want to look at some job matches, or have a question on your mind?`;
+I'm feeling great and ready to help! What's on your mind today? Want to look at job matches, interview prep, or missing skills?`;
     }
 
     return `Hey ${profile.name}! 👋 Great to chat with you! 
 
-I'm **Aria**, your AI Career Coach at ElevateAI. I'm tuned into your background as a **${profile.title}**, and I'm ready to help with anything—from practicing interview questions and salary negotiation, to planning your next career move, or just talking through ideas.
+I'm **Aria**, your AI Career Coach at ElevateAI. I'm tuned into your background as a **${profile.title}**, and I'm ready to help with anything—from reviewing your skills and roadmaps, to interview practice and salary negotiation.
 
-What's on your mind today? How can I help you out?`;
+What would you like to explore today?`;
   }
 
-  // 2. "Tell me a joke" or lighthearted prompts
+  // 4. "Tell me a joke" or lighthearted prompts
   if (p.includes("joke") || p.includes("make me laugh")) {
-    return `Here's one for tech professionals: 😄
+    return `Here's one for you: 😄
 
 *Why do programmers prefer dark mode?*
 **Because light attracts bugs!** 🐛
 
-*And for data people:*
+*And for data professionals:*
 *There are 10 types of people in this world: those who understand binary, and those who don't.*
 
 Now back to business—how can I help you land that next high-paying role today?`;
   }
 
-  // 3. Gratitude
+  // 5. Gratitude
   if (p.includes("thank") || p.includes("thanks") || p.includes("appreciate")) {
     return `You're so very welcome, ${profile.name}! ❤️ That's what I'm here for. Feel free to ask anything else anytime—whether it's big career moves, quick resume tweaks, or interview tips. We've got this!`;
   }
 
-  // 4. Why missing out on Senior roles
-  if (p.includes("senior") || p.includes("missing out") || p.includes("unlock") || p.includes("gap")) {
+  // 6. Why missing out on Senior roles & High ROI 1-Skill Unlocks
+  if (p.includes("senior") || p.includes("missing out") || p.includes("unlock") || p.includes("gap") || p.includes("missing skill")) {
     const topUnlock = oneSkillUnlocks[0];
-    const missing = topUnlock ? topUnlock.missingSkills.join(" & ") : "Cloud Architecture and System Design";
+    const missing = topUnlock ? topUnlock.missingSkills.join(" & ") : "Cloud Architecture (Snowflake / BigQuery)";
     const target = topUnlock ? topUnlock.targetRole : "Senior Specialist";
     const boost = topUnlock ? `+${topUnlock.salaryBoostPercent}% salary boost` : "+35% salary boost";
 
@@ -90,7 +176,7 @@ Looking at your profile (**${profile.name}**, currently positioned as **${profil
 
 1. **You already have the core execution muscle (80%–90% fit):**
    - You have strong command over **${profile.technicalSkills.slice(0, 4).join(", ")}**.
-   - Hiring managers already trust you to complete assigned tickets and build standard deliverables.
+   - Hiring managers already trust you to complete assigned deliverables.
 
 2. **The "Missing Link" holding you back:**
    - For **${target}** roles paying upwards of **$140k–$180k**, hiring committees look for candidates who master **${missing}**.
@@ -104,43 +190,12 @@ Looking at your profile (**${profile.name}**, currently positioned as **${profil
 Would you like me to generate a tailored 4-week study schedule for **${missing}**, or draft the exact bullet points for your resume right now?`;
   }
 
-  // 5. Explanations (e.g. "Explain machine learning", "What is SQL?")
-  if (p.includes("explain") || p.startsWith("what is ") || p.includes("how does ")) {
-    if (p.includes("machine learning") || p.includes("ai")) {
-      return `### 🤖 Machine Learning Explained Simply (Like You're 5!)
-
-Imagine you want to teach a child to recognize a dog:
-1. You don't write down a list of rules like *"A dog has 4 legs, fur, and two eyes"* (because cats and bears do too!).
-2. Instead, you show them **thousands of pictures** of dogs: *"Look, that's a dog! That's a dog too!"*
-3. Eventually, their brain spots the patterns on its own. When they see a brand new dog at the park, they instantly shout: *"Dog!"*
-
-**That is Machine Learning!**
-Instead of humans programming every single rule, we feed the computer lots of examples (data). The computer finds the mathematical patterns and learns how to make predictions on its own!
-
-In modern tech roles, ML powers Spotify song recommendations, Netflix shows, and self-driving cars. 
-
-Would you like to know how machine learning fits into your current career path?`;
-    }
-
-    if (p.includes("python")) {
-      return `### 🐍 What is Python?
-**Python** is one of the world's most popular programming languages because it reads almost like plain English. 
-
-It is the #1 tool for:
-- **Data Analysis & AI:** Pandas, NumPy, and PyTorch
-- **Web Development:** Backend APIs with FastAPI and Django
-- **Automation:** Writing scripts that do in 2 seconds what used to take 2 hours!
-
-Because of its simplicity and power, Python skills command salaries between **$110k–$190k** across data and software roles.`;
-    }
-  }
-
-  // 6. Study schedule & Learning Roadmaps
+  // 7. Study schedule & Learning Roadmaps
   if (
     p.includes("study schedule") ||
     p.includes("study plan") ||
-    p.includes("3 months") ||
-    p.includes("12 weeks") ||
+    p.includes("3 month") ||
+    p.includes("12 week") ||
     p.includes("roadmap") ||
     p.includes("how to become") ||
     (p.includes("schedule") && !p.includes("interview"))
@@ -150,7 +205,7 @@ Because of its simplicity and power, Python skills command salaries between **$1
     return `### 🗓️ Customized 12-Week Fast-Track Blueprint for **${targetRole}**
 **Candidate:** ${profile.name} | **Current Strengths:** ${profile.technicalSkills.slice(0, 3).join(", ") || "Foundational Skills"}
 
-Because you already bring valuable analytical and technical foundations, we can skip beginner fluff and accelerate directly into high-ROI skills.
+Because you already bring valuable analytical and technical foundations, we can skip beginner fluff and accelerate directly into high-ROI skills:
 
 ---
 
@@ -158,12 +213,10 @@ Because you already bring valuable analytical and technical foundations, we can 
 - **Weekly Commitment:** 8 hours (1 hr weekday, 3 hrs weekend)
 - **Focus:** Window functions (\`OVER\`, \`PARTITION BY\`, \`ROW_NUMBER\`, \`LEAD/LAG\`), CTEs, and query indexing.
 - **Milestone Project:** Build an E-Commerce Retention & Cohort Analysis schema in PostgreSQL.
-- **Verified Resources:** LeetCode SQL 50 + StrataScratch real company interview questions.
 
 #### 📍 Phase 2: Weeks 4–6 — Executive BI & Visual Storytelling
 - **Focus:** Power BI (DAX, Star Schema) or Tableau (LOD expressions, Parameter Actions).
 - **Milestone Project:** Executive SaaS Churn & Revenue Retention Dashboard with interactive filters.
-- **Verified Resources:** Maven Analytics / Tableau Public gallery case studies.
 
 #### 📍 Phase 3: Weeks 7–9 — Python Automation & Statistical A/B Testing
 - **Focus:** Pandas dataframe transformations, clean EDA, hypothesis testing (p-values, confidence intervals).
@@ -176,8 +229,8 @@ Because you already bring valuable analytical and technical foundations, we can 
 Would you like me to break down **Week 1's day-by-day checklist** with practice query exercises?`;
   }
 
-  // 6. Resume rewrite
-  if (p.includes("bullet") || p.includes("rewrite") || p.includes("resume") || p.includes("xyz")) {
+  // 8. Explicit Resume rewrite request (bullet points, xyz formula)
+  if (p.includes("bullet") || p.includes("rewrite") || p.includes("xyz") || p.includes("improve my resume")) {
     return `### ✨ High-Impact Resume Rewrite (Google XYZ Formula)
 *Formula: "Accomplished [X] as measured by [Y] by doing [Z]"*
 
@@ -206,8 +259,8 @@ Here is how we elevate your current bullet points from basic task descriptions i
 Would you like me to tailor bullet points for a specific job from your matched listings?`;
   }
 
-  // 7. Salary negotiation
-  if (p.includes("salary") || p.includes("negotiat") || p.includes("money") || p.includes("offer")) {
+  // 9. Salary negotiation
+  if (p.includes("salary") || p.includes("negotiat") || p.includes("money") || p.includes("offer") || p.includes("pay")) {
     return `### 💰 Salary Negotiation Script for Top-of-Band Compensation
 
 When negotiating for roles like **${jobMatches[0]?.title || "Senior Analyst"}** (${jobMatches[0]?.salaryRange || "$145k-$175k"}), follow this battle-tested playbook:
@@ -223,19 +276,20 @@ When negotiating for roles like **${jobMatches[0]?.title || "Senior Analyst"}** 
 Would you like me to draft a custom counter-offer email based on a specific offer you've received?`;
   }
 
-  // 8. General conversational fallback
+  // 10. General conversational fallback with tailored profile awareness
   return `### 💡 Career Coach Insight for **${profile.name}**
 
-I hear you! As your dedicated career strategist, here is how we can move forward:
+I reviewed your question regarding: *"${prompt}"*
 
-- **Top Job Opportunity:** You have a **${jobMatches[0]?.matchScore || 94}% match** for **${jobMatches[0]?.title || "Senior Analyst"}** at **${jobMatches[0]?.company || "Stripe"}** (${jobMatches[0]?.salaryRange || "$140k+"}).
-- **High-ROI Skill Unlock:** If you acquire **${oneSkillUnlocks[0]?.missingSkills?.[0] || "Cloud Warehousing"}**, you can unlock an estimated **${oneSkillUnlocks[0]?.salaryBoostPercent || 35}% salary jump**.
-${activeBlueprint ? `- **Target Blueprint:** You are exploring the **${activeBlueprint.title}** track with average market compensation of **${activeBlueprint.averageSalaryUsd}**.` : ""}
+Based on your active resume as a **${profile.title}** (${profile.experienceLevel} level):
+- **Core Skills:** ${profile.technicalSkills.slice(0, 4).join(", ")}
+- **Top Match:** **${jobMatches[0]?.title || "Senior Analyst"}** at **${jobMatches[0]?.company || "Stripe"}** (${jobMatches[0]?.matchScore || 94}% Fit)
+- **Salary Opportunity:** ${jobMatches[0]?.salaryRange || "$140k–$175k"}
+- **High-ROI Target:** Learn **${oneSkillUnlocks[0]?.missingSkills?.[0] || "Cloud Architecture"}** to unlock **${oneSkillUnlocks[0]?.targetRole || "Senior Role"}** (+${oneSkillUnlocks[0]?.salaryBoostPercent || 35}%).
 
-**What would you like to explore next?**
-1. Ask: *"Why am I missing out on Senior roles right now?"*
-2. Ask: *"Give me a weekly study schedule based on my current resume."*
-3. Ask: *"Rewrite my resume bullet points for maximum ATS impact."*
-4. Ask: *"How do I negotiate for the top of the salary band during final rounds?"*
-Or simply ask me any general career, tech, or personal growth question!`;
+**How would you like to proceed?**
+1. Ask me to list all your extracted skills and tools in detail
+2. Ask me for a weekly learning schedule to unlock Senior roles
+3. Ask me to rewrite your resume bullet points for ATS compliance
+4. Ask me interview practice questions for hiring manager rounds`;
 }

@@ -10,12 +10,14 @@ interface ApiKeyModalProps {
 
 export function ApiKeyModal({ isOpen, onClose }: ApiKeyModalProps) {
   const [geminiKey, setGeminiKey] = useState("");
+  const [groqKey, setGroqKey] = useState("");
   const [openAiKey, setOpenAiKey] = useState("");
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       setGeminiKey(localStorage.getItem("elevate_gemini_key") || "");
+      setGroqKey(localStorage.getItem("elevate_groq_key") || "");
       setOpenAiKey(localStorage.getItem("elevate_openai_key") || "");
     }
   }, [isOpen]);
@@ -23,6 +25,7 @@ export function ApiKeyModal({ isOpen, onClose }: ApiKeyModalProps) {
   const handleSave = () => {
     if (typeof window !== "undefined") {
       localStorage.setItem("elevate_gemini_key", geminiKey.trim());
+      localStorage.setItem("elevate_groq_key", groqKey.trim());
       localStorage.setItem("elevate_openai_key", openAiKey.trim());
       setSaved(true);
       setTimeout(() => {
@@ -35,8 +38,10 @@ export function ApiKeyModal({ isOpen, onClose }: ApiKeyModalProps) {
   const handleClear = () => {
     if (typeof window !== "undefined") {
       localStorage.removeItem("elevate_gemini_key");
+      localStorage.removeItem("elevate_groq_key");
       localStorage.removeItem("elevate_openai_key");
       setGeminiKey("");
+      setGroqKey("");
       setOpenAiKey("");
       setSaved(true);
       setTimeout(() => {
@@ -65,7 +70,7 @@ export function ApiKeyModal({ isOpen, onClose }: ApiKeyModalProps) {
           <div>
             <h3 className="text-base font-bold text-white">AI Engine & API Key Settings</h3>
             <p className="text-xs text-slate-400">
-              ElevateAI connects out-of-the-box, or you can use your custom keys
+              Connect Google Gemini, Groq, or OpenAI for live, human-grade conversational intelligence
             </p>
           </div>
         </div>
@@ -74,16 +79,18 @@ export function ApiKeyModal({ isOpen, onClose }: ApiKeyModalProps) {
         <div className="mt-4 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs flex items-start gap-2.5">
           <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
           <div className="text-slate-300">
-            <strong className="text-emerald-400">Live AI Active:</strong> You don't need to add any key! ElevateAI automatically connects to our live conversational AI models for full conversational chats and career guidance.
+            <strong className="text-emerald-400">Live AI Ready:</strong> Paste your Gemini, Groq, or OpenAI key below. Keys are stored safely in your browser and used directly for Aria&apos;s real-time voice and chat responses.
           </div>
         </div>
 
         {/* Custom API Key Input */}
         <div className="mt-5 space-y-4 text-xs">
+          {/* Gemini */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="font-semibold text-slate-200">
-                Google Gemini API Key (Optional)
+              <label className="font-semibold text-slate-200 flex items-center gap-1.5">
+                <span>Google Gemini API Key</span>
+                <span className="text-[10px] px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-400 font-normal">Recommended</span>
               </label>
               <a
                 href="https://aistudio.google.com/app/apikey"
@@ -91,7 +98,7 @@ export function ApiKeyModal({ isOpen, onClose }: ApiKeyModalProps) {
                 rel="noopener noreferrer"
                 className="text-cyan-400 hover:underline flex items-center gap-1 text-[11px]"
               >
-                <span>Get Free Key</span>
+                <span>Get Free Gemini Key</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
             </div>
@@ -100,14 +107,40 @@ export function ApiKeyModal({ isOpen, onClose }: ApiKeyModalProps) {
               placeholder="AIzaSy..."
               value={geminiKey}
               onChange={(e) => setGeminiKey(e.target.value)}
-              className="w-full px-3.5 py-2 rounded-xl bg-obsidian-950 border border-slate-700/80 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-mono"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-950 border border-slate-700/80 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-mono text-xs"
             />
           </div>
 
+          {/* Groq */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="font-semibold text-slate-200 flex items-center gap-1.5">
+                <span>Groq API Key (Ultra-Fast)</span>
+              </label>
+              <a
+                href="https://console.groq.com/keys"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-cyan-400 hover:underline flex items-center gap-1 text-[11px]"
+              >
+                <span>Get Free Groq Key</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
+            <input
+              type="password"
+              placeholder="gsk_..."
+              value={groqKey}
+              onChange={(e) => setGroqKey(e.target.value)}
+              className="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-950 border border-slate-700/80 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-mono text-xs"
+            />
+          </div>
+
+          {/* OpenAI */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="font-semibold text-slate-200">
-                OpenAI API Key (Optional)
+                OpenAI API Key
               </label>
               <a
                 href="https://platform.openai.com/api-keys"
@@ -115,7 +148,7 @@ export function ApiKeyModal({ isOpen, onClose }: ApiKeyModalProps) {
                 rel="noopener noreferrer"
                 className="text-cyan-400 hover:underline flex items-center gap-1 text-[11px]"
               >
-                <span>Get Key</span>
+                <span>Get OpenAI Key</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
             </div>
@@ -124,7 +157,7 @@ export function ApiKeyModal({ isOpen, onClose }: ApiKeyModalProps) {
               placeholder="sk-..."
               value={openAiKey}
               onChange={(e) => setOpenAiKey(e.target.value)}
-              className="w-full px-3.5 py-2 rounded-xl bg-obsidian-950 border border-slate-700/80 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-mono"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-950 border border-slate-700/80 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 font-mono text-xs"
             />
           </div>
         </div>
@@ -135,7 +168,7 @@ export function ApiKeyModal({ isOpen, onClose }: ApiKeyModalProps) {
             onClick={handleClear}
             className="text-xs text-slate-400 hover:text-rose-400 transition-colors"
           >
-            Reset to Default
+            Clear Keys
           </button>
 
           <div className="flex items-center gap-2">
@@ -155,7 +188,7 @@ export function ApiKeyModal({ isOpen, onClose }: ApiKeyModalProps) {
                   <span>Saved!</span>
                 </>
               ) : (
-                <span>Save Settings</span>
+                <span>Save Key Settings</span>
               )}
             </button>
           </div>

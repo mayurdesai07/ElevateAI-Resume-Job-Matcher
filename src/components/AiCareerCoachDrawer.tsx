@@ -142,9 +142,10 @@ export function AiCareerCoachDrawer({
 
     try {
       const storedGemini = typeof window !== "undefined" ? localStorage.getItem("elevate_gemini_key") : null;
+      const storedGroq = typeof window !== "undefined" ? localStorage.getItem("elevate_groq_key") : null;
       const storedOpenAi = typeof window !== "undefined" ? localStorage.getItem("elevate_openai_key") : null;
-      const userApiKey = storedGemini || storedOpenAi || undefined;
-      const apiProvider = storedGemini ? "gemini" : (storedOpenAi ? "openai" : undefined);
+      const userApiKey = storedGemini || storedGroq || storedOpenAi || undefined;
+      const apiProvider = storedGemini ? "gemini" : (storedGroq ? "groq" : (storedOpenAi ? "openai" : undefined));
 
       const res = await fetch("/api/ai", {
         method: "POST",
