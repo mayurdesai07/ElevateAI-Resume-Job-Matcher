@@ -345,9 +345,6 @@ export function ApplicationTrackerDrawer({
                   {/* Footer Meta & Actions */}
                   <div className="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
                     <div className="flex items-center gap-2">
-                      <span className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-mono">
-                        {app.source}
-                      </span>
                       <span>Applied: {app.appliedAt}</span>
                     </div>
 

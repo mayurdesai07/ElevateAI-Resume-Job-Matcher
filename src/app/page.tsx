@@ -145,8 +145,6 @@ export default function Home() {
               isEnrolled={isEnrolled}
               isSaved={isSaved}
               onOpenTracker={() => setIsTrackerDrawerOpen(true)}
-              onRefreshLiveJobs={() => fetchLiveJobs(profile)}
-              isRefreshingJobs={isRefreshingJobs}
             />
           )}
 
