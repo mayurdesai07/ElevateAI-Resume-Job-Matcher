@@ -27,6 +27,7 @@ interface AiCareerCoachFullTabProps {
   oneSkillUnlocks: OneSkillUnlock[];
   activeBlueprint?: CareerBlueprint | null;
   initialPrompt?: string;
+  onClearInitialPrompt?: () => void;
 }
 
 export function AiCareerCoachFullTab({
@@ -35,6 +36,7 @@ export function AiCareerCoachFullTab({
   oneSkillUnlocks,
   activeBlueprint,
   initialPrompt,
+  onClearInitialPrompt,
 }: AiCareerCoachFullTabProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -65,10 +67,16 @@ Click the **Microphone** below to speak, or pick any starter question!`,
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [currentlySpeakingId, setCurrentlySpeakingId] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  const usedVoiceRef = useRef<boolean>(false);
 
-  // Voice AI Hook
+  // Guards against concurrent / duplicate sends
+  const isSubmittingRef = useRef<boolean>(false);
+  const lastSentTextRef = useRef<string>("");
+  const lastSentTimeRef = useRef<number>(0);
+  const lastInjectedPromptRef = useRef<string>("");
+  const usedVoiceRef = useRef<boolean>(false);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  // Clean Voice AI Hook
   const {
     isListening,
     isSpeaking,
@@ -77,15 +85,10 @@ Click the **Microphone** below to speak, or pick any starter question!`,
     voiceError,
     startListening,
     stopListening,
+    resetTranscript,
     speakText,
     stopSpeaking,
-  } = useVoiceCoach((recognizedText) => {
-    if (recognizedText && recognizedText.trim()) {
-      setInput(recognizedText.trim());
-      usedVoiceRef.current = true;
-      handleSendMessage(recognizedText.trim());
-    }
-  });
+  } = useVoiceCoach();
 
   // Keep input updated with live interim speech while listening
   useEffect(() => {
@@ -98,20 +101,39 @@ Click the **Microphone** below to speak, or pick any starter question!`,
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading, isListening]);
 
+  // Handle external prompt injection safely
   useEffect(() => {
-    if (initialPrompt && initialPrompt.trim()) {
-      handleSendMessage(initialPrompt);
+    if (initialPrompt && initialPrompt.trim() && initialPrompt !== lastInjectedPromptRef.current) {
+      lastInjectedPromptRef.current = initialPrompt;
+      handleSendMessage(initialPrompt.trim());
+      if (onClearInitialPrompt) {
+        onClearInitialPrompt();
+      }
     }
   }, [initialPrompt]);
 
   const handleSendMessage = async (queryText?: string) => {
-    const text = queryText || input;
-    if (!text.trim() || isLoading) return;
+    const text = (queryText !== undefined ? queryText : input).trim();
+    if (!text) return;
 
+    // Mutex & Anti-spam guard: prevent rapid-fire duplicate requests
+    const now = Date.now();
+    if (isSubmittingRef.current || isLoading) return;
+    if (lastSentTextRef.current === text && now - lastSentTimeRef.current < 2500) {
+      return; // Ignore duplicate spam within 2.5 seconds
+    }
+
+    isSubmittingRef.current = true;
+    lastSentTimeRef.current = now;
+    lastSentTextRef.current = text;
+
+    // Stop listening safely if user submitted while mic was active
     if (isListening) {
       stopListening();
     }
+    resetTranscript();
 
+    // Stop speaking if Aria is talking
     if (isSpeaking) {
       stopSpeaking();
       setCurrentlySpeakingId(null);
@@ -188,18 +210,24 @@ Click the **Microphone** below to speak, or pick any starter question!`,
       ]);
     } finally {
       setIsLoading(false);
+      isSubmittingRef.current = false;
     }
   };
 
   const handleMicToggle = async () => {
     if (isListening) {
+      // User tapped mic while listening -> stop and send the transcribed voice message
       const recorded = stopListening();
-      if (recorded) {
+      const query = (recorded || transcript || input).trim();
+      if (query) {
         usedVoiceRef.current = true;
-        handleSendMessage(recorded);
+        handleSendMessage(query);
       }
     } else {
+      // User tapped mic to start speaking
       usedVoiceRef.current = true;
+      setInput("");
+      resetTranscript();
       await startListening();
     }
   };

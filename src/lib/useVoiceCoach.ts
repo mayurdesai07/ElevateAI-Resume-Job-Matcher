@@ -7,7 +7,7 @@ interface IWindow extends Window {
   webkitSpeechRecognition?: any;
 }
 
-export function useVoiceCoach(onSpeechRecognized?: (transcript: string) => void) {
+export function useVoiceCoach() {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [hasSupport, setHasSupport] = useState(true);
@@ -15,16 +15,10 @@ export function useVoiceCoach(onSpeechRecognized?: (transcript: string) => void)
   const [voiceError, setVoiceError] = useState<string | null>(null);
 
   const recognitionRef = useRef<any>(null);
-  const synthRef = useRef<SpeechSynthesis | null>(null);
+  const isListeningRef = useRef<boolean>(false);
   const finalTranscriptRef = useRef<string>("");
-  const callbackRef = useRef(onSpeechRecognized);
 
-  // Keep callback fresh
-  useEffect(() => {
-    callbackRef.current = onSpeechRecognized;
-  }, [onSpeechRecognized]);
-
-  // Clean Markdown for silky smooth Text-to-Speech
+  // Clean Markdown for smooth Text-to-Speech
   const cleanMarkdownForSpeech = (markdown: string): string => {
     return markdown
       .replace(/###/g, "")
@@ -91,18 +85,50 @@ export function useVoiceCoach(onSpeechRecognized?: (transcript: string) => void)
     setIsSpeaking(false);
   }, []);
 
-  // Initialize Speech Recognition instance
-  const initRecognition = useCallback(() => {
-    if (typeof window === "undefined") return null;
+  // Clean up recognition instance
+  const cleanupRecognition = useCallback(() => {
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.onstart = null;
+        recognitionRef.current.onresult = null;
+        recognitionRef.current.onerror = null;
+        recognitionRef.current.onend = null;
+        recognitionRef.current.stop();
+      } catch (_) {}
+      recognitionRef.current = null;
+    }
+    isListeningRef.current = false;
+    setIsListening(false);
+  }, []);
 
+  // Stop listening cleanly and return the accumulated transcript
+  const stopListening = useCallback((): string => {
+    cleanupRecognition();
+    const text = finalTranscriptRef.current.trim();
+    return text;
+  }, [cleanupRecognition]);
+
+  // Start listening
+  const startListening = useCallback(async () => {
+    if (typeof window === "undefined") return;
+
+    // Check browser support
     const win = window as unknown as IWindow;
     const SpeechRecognition = win.SpeechRecognition || win.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
       setHasSupport(false);
-      setVoiceError("Speech recognition is not supported in this browser. Please use Chrome, Edge, or Safari.");
-      return null;
+      setVoiceError("Voice recognition requires Chrome, Edge, or Safari.");
+      return;
     }
+
+    // Stop active speech first
+    stopSpeaking();
+    cleanupRecognition();
+
+    setVoiceError(null);
+    setTranscript("");
+    finalTranscriptRef.current = "";
 
     try {
       const recognition = new SpeechRecognition();
@@ -112,6 +138,7 @@ export function useVoiceCoach(onSpeechRecognized?: (transcript: string) => void)
       recognition.maxAlternatives = 1;
 
       recognition.onstart = () => {
+        isListeningRef.current = true;
         setIsListening(true);
         setVoiceError(null);
       };
@@ -130,98 +157,50 @@ export function useVoiceCoach(onSpeechRecognized?: (transcript: string) => void)
         }
 
         const combined = (accumulatedFinal + currentInterim).trim();
-        setTranscript(combined);
         finalTranscriptRef.current = combined;
+        setTranscript(combined);
       };
 
       recognition.onerror = (event: any) => {
-        console.warn("Speech recognition error:", event.error);
-        if (event.error === "not-allowed" || event.error === "service-not-allowed") {
-          setVoiceError("Microphone permission denied. Please allow microphone access in your browser address bar.");
-        } else if (event.error === "no-speech") {
-          // No speech detected, keep waiting or stop gracefully
-        } else if (event.error !== "aborted") {
-          setVoiceError(`Voice error: ${event.error}`);
+        console.warn("Speech recognition error:", event?.error);
+        if (event?.error === "not-allowed" || event?.error === "service-not-allowed") {
+          setVoiceError("Microphone access is blocked. Please allow microphone permissions in your browser address bar.");
+        } else if (event?.error !== "no-speech" && event?.error !== "aborted") {
+          setVoiceError(`Voice error: ${event?.error}`);
         }
+        isListeningRef.current = false;
         setIsListening(false);
       };
 
       recognition.onend = () => {
+        isListeningRef.current = false;
         setIsListening(false);
       };
 
-      return recognition;
-    } catch (err) {
-      console.error("Failed to construct SpeechRecognition:", err);
-      return null;
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (err: any) {
+      console.warn("Error starting speech recognition:", err);
+      setVoiceError("Could not start microphone. Please ensure microphone permissions are allowed.");
+      isListeningRef.current = false;
+      setIsListening(false);
     }
-  }, []);
+  }, [stopSpeaking, cleanupRecognition]);
 
-  // Start listening with explicit microphone permission request
-  const startListening = useCallback(async () => {
-    setVoiceError(null);
+  const resetTranscript = useCallback(() => {
     setTranscript("");
     finalTranscriptRef.current = "";
-
-    // Stop speech if speaking
-    stopSpeaking();
-
-    // 1. Explicitly request microphone stream to trigger browser prompt
-    if (typeof navigator !== "undefined" && navigator.mediaDevices?.getUserMedia) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        // Immediately stop stream tracks; we just needed permission verified
-        stream.getTracks().forEach((track) => track.stop());
-      } catch (err: any) {
-        console.warn("Microphone permission error:", err);
-        setVoiceError("Microphone permission denied. Please click the lock/settings icon in your browser address bar and allow Microphone.");
-        setIsListening(false);
-        return;
-      }
-    }
-
-    // 2. Initialize or re-use recognition instance
-    if (!recognitionRef.current) {
-      recognitionRef.current = initRecognition();
-    }
-
-    if (!recognitionRef.current) return;
-
-    try {
-      recognitionRef.current.abort();
-    } catch (_) {}
-
-    try {
-      recognitionRef.current.start();
-      setIsListening(true);
-    } catch (e: any) {
-      console.warn("Error starting speech recognition:", e);
-      // If already started or restarting
-      try {
-        recognitionRef.current.stop();
-        setTimeout(() => {
-          recognitionRef.current?.start();
-          setIsListening(true);
-        }, 150);
-      } catch (_) {}
-    }
-  }, [initRecognition, stopSpeaking]);
-
-  // Stop listening and return whatever was recorded
-  const stopListening = useCallback(() => {
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.stop();
-      } catch (_) {}
-    }
-    setIsListening(false);
-
-    const text = finalTranscriptRef.current.trim();
-    if (text && callbackRef.current) {
-      callbackRef.current(text);
-    }
-    return text;
   }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      cleanupRecognition();
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [cleanupRecognition]);
 
   return {
     isListening,
@@ -231,6 +210,7 @@ export function useVoiceCoach(onSpeechRecognized?: (transcript: string) => void)
     voiceError,
     startListening,
     stopListening,
+    resetTranscript,
     speakText,
     stopSpeaking,
   };

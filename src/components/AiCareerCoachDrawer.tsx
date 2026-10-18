@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ChatMessage, ResumeProfile, JobMatch, OneSkillUnlock, CareerBlueprint } from "@/types";
 import {
-  MessageSquareCode,
   Sparkles,
   X,
   Send,
@@ -26,6 +25,7 @@ interface AiCareerCoachDrawerProps {
   oneSkillUnlocks: OneSkillUnlock[];
   activeBlueprint?: CareerBlueprint | null;
   initialPrompt?: string;
+  onClearInitialPrompt?: () => void;
 }
 
 export function AiCareerCoachDrawer({
@@ -36,6 +36,7 @@ export function AiCareerCoachDrawer({
   oneSkillUnlocks,
   activeBlueprint,
   initialPrompt,
+  onClearInitialPrompt,
 }: AiCareerCoachDrawerProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -55,10 +56,16 @@ export function AiCareerCoachDrawer({
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [currentlySpeakingId, setCurrentlySpeakingId] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  const usedVoiceRef = useRef<boolean>(false);
 
-  // Voice AI Hook
+  // Guards against concurrent / duplicate sends
+  const isSubmittingRef = useRef<boolean>(false);
+  const lastSentTextRef = useRef<string>("");
+  const lastSentTimeRef = useRef<number>(0);
+  const lastInjectedPromptRef = useRef<string>("");
+  const usedVoiceRef = useRef<boolean>(false);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  // Clean Voice AI Hook
   const {
     isListening,
     isSpeaking,
@@ -67,17 +74,12 @@ export function AiCareerCoachDrawer({
     voiceError,
     startListening,
     stopListening,
+    resetTranscript,
     speakText,
     stopSpeaking,
-  } = useVoiceCoach((recognizedText) => {
-    if (recognizedText && recognizedText.trim()) {
-      setInput(recognizedText.trim());
-      usedVoiceRef.current = true;
-      handleSendMessage(recognizedText.trim());
-    }
-  });
+  } = useVoiceCoach();
 
-  // Keep input updated in real-time with live speech transcript
+  // Keep input updated in real-time with live speech transcript while listening
   useEffect(() => {
     if (isListening && transcript) {
       setInput(transcript);
@@ -89,21 +91,39 @@ export function AiCareerCoachDrawer({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading, isListening]);
 
-  // Handle initial external prompt injection
+  // Handle external prompt injection safely (only once per unique prompt)
   useEffect(() => {
-    if (initialPrompt && initialPrompt.trim()) {
-      handleSendMessage(initialPrompt);
+    if (initialPrompt && initialPrompt.trim() && initialPrompt !== lastInjectedPromptRef.current) {
+      lastInjectedPromptRef.current = initialPrompt;
+      handleSendMessage(initialPrompt.trim());
+      if (onClearInitialPrompt) {
+        onClearInitialPrompt();
+      }
     }
   }, [initialPrompt]);
 
   const handleSendMessage = async (textToSend?: string) => {
-    const query = textToSend || input;
-    if (!query.trim() || isLoading) return;
+    const query = (textToSend !== undefined ? textToSend : input).trim();
+    if (!query) return;
 
+    // Mutex & Anti-spam guard: prevent rapid-fire duplicate requests
+    const now = Date.now();
+    if (isSubmittingRef.current || isLoading) return;
+    if (lastSentTextRef.current === query && now - lastSentTimeRef.current < 2500) {
+      return; // Ignore identical prompt within 2.5 seconds
+    }
+
+    isSubmittingRef.current = true;
+    lastSentTimeRef.current = now;
+    lastSentTextRef.current = query;
+
+    // Stop listening safely if user submitted while mic was active
     if (isListening) {
       stopListening();
     }
+    resetTranscript();
 
+    // Stop speaking if Aria is currently talking
     if (isSpeaking) {
       stopSpeaking();
       setCurrentlySpeakingId(null);
@@ -159,7 +179,7 @@ export function AiCareerCoachDrawer({
 
       setMessages((prev) => [...prev, assistantMessage]);
 
-      // Automatically speak Aria's response if user spoke via mic!
+      // Automatically speak Aria's response if user used the microphone
       if (usedVoiceRef.current) {
         setCurrentlySpeakingId(assistantMessage.id);
         speakText(replyText, () => {
@@ -180,20 +200,24 @@ export function AiCareerCoachDrawer({
       ]);
     } finally {
       setIsLoading(false);
+      isSubmittingRef.current = false;
     }
   };
 
   const handleMicToggle = async () => {
     if (isListening) {
-      // User tapped mic to finish speaking -> stop and send
+      // User tapped mic to finish speaking -> stop and send the transcribed message
       const recorded = stopListening();
-      if (recorded) {
+      const query = (recorded || transcript || input).trim();
+      if (query) {
         usedVoiceRef.current = true;
-        handleSendMessage(recorded);
+        handleSendMessage(query);
       }
     } else {
       // User tapped mic to start speaking
       usedVoiceRef.current = true;
+      setInput("");
+      resetTranscript();
       await startListening();
     }
   };

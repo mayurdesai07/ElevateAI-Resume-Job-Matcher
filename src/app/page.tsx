@@ -109,6 +109,7 @@ export default function Home() {
         oneSkillUnlocks={oneSkillUnlocks}
         activeBlueprint={activeBlueprint}
         initialPrompt={injectedAiPrompt}
+        onClearInitialPrompt={() => setInjectedAiPrompt("")}
       />
 
       {/* API Key & AI Engine Configuration Modal */}
