@@ -134,6 +134,11 @@ export function JobMatchesTab({
       {/* Jobs Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {filteredJobs.map((job) => {
+          // Circular progress math
+          const radius = 22;
+          const circumference = 2 * Math.PI * radius;
+          const strokeDashoffset = circumference - (job.matchScore / 100) * circumference;
+
           const enrolled = isEnrolled(job.id);
           const saved = isSaved(job.id);
 
@@ -145,30 +150,69 @@ export function JobMatchesTab({
               }`}
             >
               <div>
-                {/* Title & Company Details */}
-                <div className="space-y-1.5">
-                  <h3 className="font-bold text-base text-white hover:text-emerald-300 transition-colors">
-                    {job.title}
-                  </h3>
+                {/* Top Row: Title, Company Details & Top-Right Circular Percentage Ring */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="space-y-1.5">
+                    <h3 className="font-bold text-base text-white hover:text-emerald-300 transition-colors">
+                      {job.title}
+                    </h3>
 
-                  <div className="flex items-center gap-2.5 text-xs text-slate-400 flex-wrap">
-                    <span className="font-semibold text-emerald-400 flex items-center gap-1">
-                      <Building className="w-3.5 h-3.5" />
-                      {job.company}
-                    </span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1 text-slate-300">
-                      <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                      {job.location}
-                    </span>
-                    <span>•</span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-800 border border-slate-700 text-slate-300 font-medium">
-                      {job.workplaceType}
-                    </span>
+                    <div className="flex items-center gap-2.5 text-xs text-slate-400 flex-wrap">
+                      <span className="font-semibold text-emerald-400 flex items-center gap-1">
+                        <Building className="w-3.5 h-3.5" />
+                        {job.company}
+                      </span>
+                      <span>•</span>
+                      <span className="flex items-center gap-1 text-slate-300">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                        {job.location}
+                      </span>
+                      <span>•</span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] bg-slate-800 border border-slate-700 text-slate-300 font-medium">
+                        {job.workplaceType}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Circular Match Ring Badge (Top Right) */}
+                  <div className="relative flex items-center justify-center shrink-0">
+                    <svg className="w-14 h-14 -rotate-90">
+                      <circle
+                        cx="28"
+                        cy="28"
+                        r={radius}
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        className="text-slate-800"
+                        fill="transparent"
+                      />
+                      <circle
+                        cx="28"
+                        cy="28"
+                        r={radius}
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        strokeDasharray={circumference}
+                        strokeDashoffset={strokeDashoffset}
+                        strokeLinecap="round"
+                        className={
+                          job.matchScore >= 90
+                            ? "text-emerald-400"
+                            : job.matchScore >= 80
+                            ? "text-teal-400"
+                            : "text-amber-400"
+                        }
+                        fill="transparent"
+                      />
+                    </svg>
+                    <div className="absolute flex flex-col items-center">
+                      <span className="text-xs font-black text-white">{job.matchScore}%</span>
+                      <span className="text-[8px] font-bold uppercase text-slate-400">FIT</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Salary & Level Tags */}
+                {/* Salary, Level & Application Metadata */}
                 <div className="mt-3.5 flex items-center gap-2 flex-wrap">
                   <div className="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs font-bold text-emerald-400 flex items-center gap-1">
                     <DollarSign className="w-3.5 h-3.5" />
@@ -176,6 +220,9 @@ export function JobMatchesTab({
                   </div>
                   <span className="text-xs px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 font-medium">
                     {job.experienceLevel} Tier
+                  </span>
+                  <span className="text-xs text-slate-400">
+                    {job.applicantsCount} applicants · Posted {job.postedDaysAgo}d ago
                   </span>
                 </div>
 
