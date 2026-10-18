@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/jobs?cron=true&location=Bengaluru",
+      "schedule": "0 * * * *"
+    }
+  ]
+}

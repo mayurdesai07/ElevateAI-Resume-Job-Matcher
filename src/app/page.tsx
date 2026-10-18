@@ -29,6 +29,8 @@ export default function Home() {
   // Real-time job matches state
   const [liveJobs, setLiveJobs] = useState<JobMatch[]>(() => calculateJobMatches(profile));
   const [isRefreshingJobs, setIsRefreshingJobs] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<string>("Bengaluru");
+  const [lastRefreshedAt, setLastRefreshedAt] = useState<Date>(new Date());
 
   // Application tracker state & hooks
   const {
@@ -53,19 +55,20 @@ export default function Home() {
   const oneSkillUnlocks = generateOneSkillUnlocks(profile);
   const activeBlueprint = MASTER_CAREER_BLUEPRINTS[activeBlueprintId] || MASTER_CAREER_BLUEPRINTS["data-analyst"];
 
-  // Fetch live jobs from /api/jobs (Jobicy, Greenhouse, RemoteOK)
-  const fetchLiveJobs = useCallback(async (currentProfile: ResumeProfile) => {
+  // Fetch live jobs from /api/jobs (LinkedIn Live, Jobicy, Greenhouse)
+  const fetchLiveJobs = useCallback(async (currentProfile: ResumeProfile, location: string = selectedLocation) => {
     setIsRefreshingJobs(true);
     try {
       const res = await fetch("/api/jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ profile: currentProfile }),
+        body: JSON.stringify({ profile: currentProfile, location }),
       });
       if (res.ok) {
         const data = await res.json();
         if (data.jobs && Array.isArray(data.jobs) && data.jobs.length > 0) {
           setLiveJobs(data.jobs);
+          setLastRefreshedAt(new Date());
         }
       }
     } catch (e) {
@@ -74,12 +77,27 @@ export default function Home() {
     } finally {
       setIsRefreshingJobs(false);
     }
-  }, []);
+  }, [selectedLocation]);
 
   // Ingest live jobs on initial load and when profile changes
   useEffect(() => {
-    fetchLiveJobs(profile);
-  }, [profile, fetchLiveJobs]);
+    fetchLiveJobs(profile, selectedLocation);
+  }, [profile, selectedLocation, fetchLiveJobs]);
+
+  // Hourly automated job discovery loop (every 60 minutes)
+  useEffect(() => {
+    const ONE_HOUR_MS = 60 * 60 * 1000;
+    const interval = setInterval(() => {
+      fetchLiveJobs(profile, selectedLocation);
+    }, ONE_HOUR_MS);
+
+    return () => clearInterval(interval);
+  }, [profile, selectedLocation, fetchLiveJobs]);
+
+  const handleSelectLocation = (loc: string) => {
+    setSelectedLocation(loc);
+    fetchLiveJobs(profile, loc);
+  };
 
   const handleOpenAiWithPrompt = (promptText: string) => {
     setInjectedAiPrompt(promptText);
@@ -140,6 +158,11 @@ export default function Home() {
             <JobMatchesTab
               jobs={liveJobs}
               profile={profile}
+              selectedLocation={selectedLocation}
+              onSelectLocation={handleSelectLocation}
+              isRefreshing={isRefreshingJobs}
+              onRefresh={() => fetchLiveJobs(profile, selectedLocation)}
+              lastRefreshedAt={lastRefreshedAt}
               onEnrollAndApply={enrollAndApply}
               onSaveJob={saveJob}
               isEnrolled={isEnrolled}

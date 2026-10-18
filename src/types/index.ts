@@ -35,6 +35,8 @@ export interface JobMatch {
   applicantsCount: number;
   url?: string;
   source?: string;
+  isNew?: boolean;
+  discoveredAt?: number;
 }
 
 export type ApplicationStatus =
