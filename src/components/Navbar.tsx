@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Sparkles,
   Compass,
@@ -10,7 +10,13 @@ import {
   KeyRound,
   CheckCircle2,
   Building2,
+  User,
+  LogIn,
+  LogOut,
+  ChevronDown,
+  ShieldCheck,
 } from "lucide-react";
+import { UserAccount } from "@/types";
 
 interface NavbarProps {
   activeTab: "jobs" | "unlocks" | "roadmaps" | "ai";
@@ -19,6 +25,9 @@ interface NavbarProps {
   onOpenKeyModal: () => void;
   onOpenTracker: () => void;
   onOpenComposioModal: () => void;
+  currentUser: UserAccount | null;
+  onOpenAuthModal: () => void;
+  onLogout: () => void;
   matchesCount: number;
   unlocksCount: number;
   applicationsCount: number;
@@ -31,10 +40,24 @@ export function Navbar({
   onOpenKeyModal,
   onOpenTracker,
   onOpenComposioModal,
+  currentUser,
+  onOpenAuthModal,
+  onLogout,
   matchesCount,
   unlocksCount,
   applicationsCount,
 }: NavbarProps) {
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
+
+  const isGuest = !currentUser || currentUser.isGuest;
+  const displayName = currentUser ? currentUser.name : "Guest";
+  const userInitials = displayName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-800/80 bg-obsidian-950/80 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -115,7 +138,7 @@ export function Navbar({
           </button>
         </nav>
 
-        {/* Right Actions: Tracker, Integrations, AI Drawer */}
+        {/* Right Actions: Tracker, Integrations, Auth Profile, AI Drawer */}
         <div className="flex items-center gap-2">
           {/* Applications & Pipeline Hub Button */}
           <button
@@ -160,8 +183,76 @@ export function Navbar({
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span>Aria AI</span>
+            <span className="hidden sm:inline">Aria AI</span>
           </button>
+
+          {/* User Auth Profile / Guest Login Pill */}
+          <div className="relative">
+            {isGuest ? (
+              <button
+                onClick={onOpenAuthModal}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition-all"
+                title="Sign in to save your resume forever, or continue as guest"
+              >
+                <User className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="hidden sm:inline">Sign In</span>
+                <span className="text-[10px] text-slate-400 hidden lg:inline">(or Guest)</span>
+              </button>
+            ) : (
+              <div className="relative">
+                <button
+                  onClick={() => setShowUserDropdown(!showUserDropdown)}
+                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-obsidian-900 hover:bg-slate-800 border border-emerald-500/40 text-xs font-semibold text-white transition-all shadow-sm"
+                >
+                  <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-[10px] font-black text-obsidian-950">
+                    {userInitials}
+                  </div>
+                  <span className="max-w-[80px] sm:max-w-[110px] truncate">{displayName}</span>
+                  <ChevronDown className="w-3 h-3 text-slate-400" />
+                </button>
+
+                {/* Dropdown Menu */}
+                {showUserDropdown && (
+                  <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-obsidian-900 border border-slate-700/80 shadow-2xl p-3 text-xs space-y-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="pb-2 border-b border-slate-800">
+                      <div className="font-bold text-white flex items-center gap-1.5">
+                        <span>{displayName}</span>
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                      </div>
+                      <div className="text-[11px] text-slate-400 truncate">{currentUser.email}</div>
+                    </div>
+
+                    <div className="py-1 text-[11px] text-emerald-400 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                      <span>Resume saved permanently</span>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setShowUserDropdown(false);
+                        onOpenAuthModal();
+                      }}
+                      className="w-full text-left px-2 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors flex items-center gap-2"
+                    >
+                      <User className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Switch Account</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setShowUserDropdown(false);
+                        onLogout();
+                      }}
+                      className="w-full text-left px-2 py-1.5 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors flex items-center gap-2"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Log Out (Guest Mode)</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

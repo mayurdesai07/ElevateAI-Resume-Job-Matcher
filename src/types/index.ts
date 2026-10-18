@@ -152,3 +152,14 @@ export interface ChatMessage {
   timestamp: string;
   suggestedPrompts?: string[];
 }
+
+export interface UserAccount {
+  id: string;
+  email: string;
+  name: string;
+  password?: string;
+  isGuest: boolean;
+  savedProfile?: ResumeProfile;
+  createdAt: string;
+  lastLoginAt: string;
+}

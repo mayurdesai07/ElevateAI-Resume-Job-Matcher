@@ -18,13 +18,48 @@ import { ApiKeyModal } from "@/components/ApiKeyModal";
 import { ApplicationTrackerDrawer } from "@/components/ApplicationTrackerDrawer";
 import { ComposioModal } from "@/components/ComposioModal";
 import { useApplicationTracker } from "@/lib/useApplicationTracker";
+import { useAuth } from "@/lib/useAuth";
+import { AuthModal } from "@/components/AuthModal";
 import { Sparkles } from "lucide-react";
 
 export default function Home() {
-  // Candidate profile state (defaulting to Alex Rivera - Data Analyst)
-  const [profile, setProfile] = useState<ResumeProfile>(SAMPLE_RESUMES.alex_data_analyst);
+  // User Authentication & Resume Memory State
+  const {
+    currentUser,
+    isGuest,
+    isAuthModalOpen,
+    openAuthModal,
+    closeAuthModal,
+    login,
+    signup,
+    loginAsGuest,
+    logout,
+    saveProfileForUser,
+  } = useAuth();
+  const [savedResumeToast, setSavedResumeToast] = useState(false);
+
+  // Candidate profile state (initializes to currentUser.savedProfile or Alex Rivera)
+  const [profile, setProfile] = useState<ResumeProfile>(
+    () => currentUser?.savedProfile || SAMPLE_RESUMES.alex_data_analyst
+  );
+
+  // Automatically load the person's saved resume whenever they log in or switch accounts
+  useEffect(() => {
+    if (currentUser?.savedProfile) {
+      setProfile(currentUser.savedProfile);
+    }
+  }, [currentUser]);
+
   const [activeTab, setActiveTab] = useState<"jobs" | "unlocks" | "roadmaps" | "ai">("jobs");
   const [activeBlueprintId, setActiveBlueprintId] = useState<string>("data-analyst");
+
+  // Save uploaded resume permanently to active user account
+  const handleProfileLoaded = (newProfile: ResumeProfile) => {
+    setProfile(newProfile);
+    saveProfileForUser(newProfile);
+    setSavedResumeToast(true);
+    setTimeout(() => setSavedResumeToast(false), 4500);
+  };
 
   // Real-time job matches state
   const [liveJobs, setLiveJobs] = useState<JobMatch[]>(() => calculateJobMatches(profile));
@@ -134,6 +169,9 @@ export default function Home() {
         onOpenKeyModal={() => setIsKeyModalOpen(true)}
         onOpenTracker={() => setIsTrackerDrawerOpen(true)}
         onOpenComposioModal={() => setIsComposioModalOpen(true)}
+        currentUser={currentUser}
+        onOpenAuthModal={openAuthModal}
+        onLogout={logout}
         matchesCount={liveJobs.length}
         unlocksCount={oneSkillUnlocks.length}
         applicationsCount={applications.length}
@@ -144,9 +182,7 @@ export default function Home() {
         {/* Hero & Resume Dropzone */}
         <HeroDropzone
           activeProfile={profile}
-          onProfileLoaded={(newProfile) => {
-            setProfile(newProfile);
-          }}
+          onProfileLoaded={handleProfileLoaded}
         />
 
         {/* Extracted Profile Summary Card */}
@@ -242,6 +278,32 @@ export default function Home() {
         isOpen={isKeyModalOpen}
         onClose={() => setIsKeyModalOpen(false)}
       />
+
+      {/* User Authentication & Guest Access Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={closeAuthModal}
+        onLogin={login}
+        onSignup={signup}
+        onLoginAsGuest={loginAsGuest}
+      />
+
+      {/* Resume Saved Forever Toast Notification */}
+      {savedResumeToast && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 p-3.5 px-5 rounded-2xl bg-obsidian-900 border border-emerald-500/60 shadow-glow text-white text-xs flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="w-6 h-6 rounded-lg bg-emerald-500 text-obsidian-950 flex items-center justify-center font-black">
+            ✓
+          </div>
+          <div>
+            <div className="font-bold text-emerald-400">Resume Stored &amp; Remembered!</div>
+            <div className="text-slate-300">
+              {currentUser && !currentUser.isGuest
+                ? `Linked permanently to ${currentUser.email} (${currentUser.name})`
+                : "Saved to your active session — Create a free account anytime to access across devices."}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Persistent Floating AI Action Button (Bottom Right) */}
       <aside aria-label="Quick Actions" className="fixed bottom-6 right-6 z-40 flex items-center gap-2">
