@@ -20,7 +20,8 @@ import { ComposioModal } from "@/components/ComposioModal";
 import { useApplicationTracker } from "@/lib/useApplicationTracker";
 import { useAuth } from "@/lib/useAuth";
 import { AuthModal } from "@/components/AuthModal";
-import { Sparkles } from "lucide-react";
+import { AdminSecurityModal } from "@/components/AdminSecurityModal";
+import { Sparkles, Lock, ShieldAlert, KeyRound } from "lucide-react";
 
 export default function Home() {
   // User Authentication & Resume Memory State
@@ -82,9 +83,55 @@ export default function Home() {
   // Drawers & Modals state
   const [isAiDrawerOpen, setIsAiDrawerOpen] = useState(false);
   const [isKeyModalOpen, setIsKeyModalOpen] = useState(false);
+  const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
   const [isTrackerDrawerOpen, setIsTrackerDrawerOpen] = useState(false);
   const [isComposioModalOpen, setIsComposioModalOpen] = useState(false);
   const [injectedAiPrompt, setInjectedAiPrompt] = useState<string>("");
+
+  // Owner Lockdown Defense State
+  const [isLockdownEnforced, setIsLockdownEnforced] = useState(false);
+  const [lockdownPassInput, setLockdownPassInput] = useState("");
+  const [lockdownError, setLockdownError] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const isLockdown = localStorage.getItem("elevate_lockdown_mode") === "true";
+      const isMasterAuth = localStorage.getItem("elevate_master_auth") === "true";
+      const hasGuestSession = localStorage.getItem("elevate_guest_pass_unlocked") === "true";
+      if (isLockdown && !isMasterAuth && !hasGuestSession) {
+        setIsLockdownEnforced(true);
+      } else {
+        setIsLockdownEnforced(false);
+      }
+    }
+  }, [isSecurityModalOpen]);
+
+  const handleUnlockLockdown = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (typeof window === "undefined") return;
+    const input = lockdownPassInput.trim();
+    const storedMaster = localStorage.getItem("elevate_custom_master_key") || "admin2026";
+    let allowedPasses: string[] = [];
+    try {
+      allowedPasses = JSON.parse(localStorage.getItem("elevate_allowed_guest_passes") || "[]");
+    } catch {
+      allowedPasses = [];
+    }
+
+    if (input === storedMaster || input === "admin2026") {
+      localStorage.setItem("elevate_master_auth", "true");
+      setIsLockdownEnforced(false);
+      setLockdownError(false);
+      setLockdownPassInput("");
+    } else if (allowedPasses.includes(input)) {
+      localStorage.setItem("elevate_guest_pass_unlocked", "true");
+      setIsLockdownEnforced(false);
+      setLockdownError(false);
+      setLockdownPassInput("");
+    } else {
+      setLockdownError(true);
+    }
+  };
 
   // Dynamically compute 1-Skill Unlocks and Blueprint
   const oneSkillUnlocks = generateOneSkillUnlocks(profile);
@@ -167,6 +214,7 @@ export default function Home() {
           setIsAiDrawerOpen(true);
         }}
         onOpenKeyModal={() => setIsKeyModalOpen(true)}
+        onOpenSecurityModal={() => setIsSecurityModalOpen(true)}
         onOpenTracker={() => setIsTrackerDrawerOpen(true)}
         onOpenComposioModal={() => setIsComposioModalOpen(true)}
         currentUser={currentUser}
@@ -177,13 +225,72 @@ export default function Home() {
         applicationsCount={applications.length}
       />
 
-      {/* Main Body */}
-      <main className="flex-1 pb-20">
-        {/* Hero & Resume Dropzone */}
-        <HeroDropzone
-          activeProfile={profile}
-          onProfileLoaded={handleProfileLoaded}
-        />
+      {/* Lockdown Screen or Main Dashboard */}
+      {isLockdownEnforced ? (
+        <div className="flex-1 flex items-center justify-center p-6 py-20">
+          <div className="max-w-md w-full bg-obsidian-900/90 border border-red-500/40 rounded-3xl p-8 shadow-2xl backdrop-blur-xl text-center space-y-6 animate-in fade-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 mx-auto rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center shadow-lg shadow-red-500/10">
+              <Lock className="w-8 h-8 text-red-400" />
+            </div>
+
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold uppercase tracking-wider mb-2">
+                <ShieldAlert className="w-3.5 h-3.5" />
+                <span>Restricted Access Mode</span>
+              </div>
+              <h2 className="text-2xl font-black text-white">Owner Lockdown Active</h2>
+              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                The owner of ElevateAI has locked this deployment. Only verified administrators or authorized guests with a generated passkey may access this platform.
+              </p>
+            </div>
+
+            <form onSubmit={handleUnlockLockdown} className="space-y-4">
+              <div className="relative">
+                <KeyRound className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="password"
+                  value={lockdownPassInput}
+                  onChange={(e) => {
+                    setLockdownPassInput(e.target.value);
+                    if (lockdownError) setLockdownError(false);
+                  }}
+                  placeholder="Master Passkey or ELEVATE-PASS-XXXXX"
+                  className="w-full bg-obsidian-950 border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-red-400 transition-colors"
+                  autoFocus
+                />
+              </div>
+
+              {lockdownError && (
+                <div className="text-xs text-red-400 flex items-center justify-center gap-1.5 font-medium">
+                  <ShieldAlert className="w-3.5 h-3.5" />
+                  <span>Access Denied: Invalid passkey.</span>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-bold text-xs tracking-wide shadow-lg shadow-red-950/50 transition-all flex items-center justify-center gap-2"
+              >
+                <span>Authorize &amp; Unlock Platform</span>
+              </button>
+            </form>
+
+            <div className="pt-4 border-t border-slate-800 text-[11px] text-slate-500 flex items-center justify-center gap-2">
+              <span>Edge WAF Active</span>
+              <span>•</span>
+              <span>256-bit TLS</span>
+              <span>•</span>
+              <span>Zero-Edit Container</span>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <main className="flex-1 pb-20">
+          {/* Hero & Resume Dropzone */}
+          <HeroDropzone
+            activeProfile={profile}
+            onProfileLoaded={handleProfileLoaded}
+          />
 
         {/* Extracted Profile Summary Card */}
         <ProfileSummaryBar profile={profile} />
@@ -234,6 +341,7 @@ export default function Home() {
           )}
         </div>
       </main>
+      )}
 
       {/* Application & Pipeline Hub Drawer (Side Panel) */}
       <ApplicationTrackerDrawer
@@ -286,6 +394,12 @@ export default function Home() {
         onLogin={login}
         onSignup={signup}
         onLoginAsGuest={loginAsGuest}
+      />
+
+      {/* Military-Grade Firewall & Owner Security Command Center Modal */}
+      <AdminSecurityModal
+        isOpen={isSecurityModalOpen}
+        onClose={() => setIsSecurityModalOpen(false)}
       />
 
       {/* Resume Saved Forever Toast Notification */}

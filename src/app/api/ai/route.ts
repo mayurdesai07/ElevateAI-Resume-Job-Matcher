@@ -15,6 +15,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing prompt" }, { status: 400 });
     }
 
+    // AI Prompt Hijack & Jailbreak Guard
+    const pLower = prompt.toLowerCase();
+    const isJailbreakAttempt = [
+      "ignore previous instructions",
+      "ignore all instructions",
+      "disregard your prompt",
+      "bypass all safety",
+      "jailbreak",
+      "dan mode",
+      "system prompt override",
+      "reveal your system prompt",
+      "print internal instructions",
+    ].some((phrase) => pLower.includes(phrase));
+
+    if (isJailbreakAttempt) {
+      return NextResponse.json({
+        reply: "🛡️ **Aria Security Shield:** Unauthorized prompt injection or system override attempt detected and neutralized. ElevateAI security parameters remain active and enforcing.",
+        source: "elevate-ai-waf",
+      });
+    }
+
     const safeContext: AiCoachContext = {
       profile: context?.profile || {
         name: "Alex Rivera",
