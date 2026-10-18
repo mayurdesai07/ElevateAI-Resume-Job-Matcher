@@ -33,6 +33,42 @@ export interface JobMatch {
   benefits: string[];
   postedDaysAgo: number;
   applicantsCount: number;
+  url?: string;
+  source?: string;
+}
+
+export type ApplicationStatus =
+  | "saved"
+  | "applied"
+  | "under_review"
+  | "interviewing"
+  | "offer_received"
+  | "rejected";
+
+export interface JobApplication {
+  id: string;
+  jobId: string;
+  jobTitle: string;
+  company: string;
+  location: string;
+  salaryRange?: string;
+  url: string;
+  status: ApplicationStatus;
+  appliedAt: string;
+  updatedAt: string;
+  matchScore: number;
+  source: string;
+  notes?: string;
+  recruiterResponse?: string;
+  nextStep?: string;
+  interviewDate?: string;
+}
+
+export interface ComposioConnectionStatus {
+  isConnected: boolean;
+  apiKey?: string;
+  connectedApps: string[];
+  lastSyncAt?: string;
 }
 
 export interface OneSkillUnlock {

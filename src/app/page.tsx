@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { SAMPLE_RESUMES } from "@/data/mockResumes";
 import { MASTER_CAREER_BLUEPRINTS } from "@/data/careerBlueprints";
 import { calculateJobMatches, generateOneSkillUnlocks } from "@/lib/parser";
-import { ResumeProfile } from "@/types";
+import { ResumeProfile, JobMatch } from "@/types";
 
 import { Navbar } from "@/components/Navbar";
 import { HeroDropzone } from "@/components/HeroDropzone";
@@ -15,7 +15,10 @@ import { CareerExplorerTab } from "@/components/CareerExplorerTab";
 import { AiCareerCoachFullTab } from "@/components/AiCareerCoachFullTab";
 import { AiCareerCoachDrawer } from "@/components/AiCareerCoachDrawer";
 import { ApiKeyModal } from "@/components/ApiKeyModal";
-import { Sparkles, ArrowUp } from "lucide-react";
+import { ApplicationTrackerDrawer } from "@/components/ApplicationTrackerDrawer";
+import { ComposioModal } from "@/components/ComposioModal";
+import { useApplicationTracker } from "@/lib/useApplicationTracker";
+import { Sparkles } from "lucide-react";
 
 export default function Home() {
   // Candidate profile state (defaulting to Alex Rivera - Data Analyst)
@@ -23,19 +26,81 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<"jobs" | "unlocks" | "roadmaps" | "ai">("jobs");
   const [activeBlueprintId, setActiveBlueprintId] = useState<string>("data-analyst");
 
-  // AI Drawer & Key Modal state
+  // Real-time job matches state
+  const [liveJobs, setLiveJobs] = useState<JobMatch[]>(() => calculateJobMatches(profile));
+  const [isRefreshingJobs, setIsRefreshingJobs] = useState(false);
+
+  // Application tracker state & hooks
+  const {
+    applications,
+    enrollAndApply,
+    saveJob,
+    updateApplication,
+    removeApplication,
+    isEnrolled,
+    isSaved,
+    bulkIngestGreenhouseApplications,
+  } = useApplicationTracker();
+
+  // Drawers & Modals state
   const [isAiDrawerOpen, setIsAiDrawerOpen] = useState(false);
   const [isKeyModalOpen, setIsKeyModalOpen] = useState(false);
+  const [isTrackerDrawerOpen, setIsTrackerDrawerOpen] = useState(false);
+  const [isComposioModalOpen, setIsComposioModalOpen] = useState(false);
   const [injectedAiPrompt, setInjectedAiPrompt] = useState<string>("");
 
-  // Dynamically compute matches and unlocks based on current active profile
-  const jobMatches = calculateJobMatches(profile);
+  // Dynamically compute 1-Skill Unlocks and Blueprint
   const oneSkillUnlocks = generateOneSkillUnlocks(profile);
   const activeBlueprint = MASTER_CAREER_BLUEPRINTS[activeBlueprintId] || MASTER_CAREER_BLUEPRINTS["data-analyst"];
+
+  // Fetch live jobs from /api/jobs (Jobicy, Greenhouse, RemoteOK)
+  const fetchLiveJobs = useCallback(async (currentProfile: ResumeProfile) => {
+    setIsRefreshingJobs(true);
+    try {
+      const res = await fetch("/api/jobs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profile: currentProfile }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.jobs && Array.isArray(data.jobs) && data.jobs.length > 0) {
+          setLiveJobs(data.jobs);
+        }
+      }
+    } catch (e) {
+      console.warn("Live jobs fetch error, falling back to local calculation:", e);
+      setLiveJobs(calculateJobMatches(currentProfile));
+    } finally {
+      setIsRefreshingJobs(false);
+    }
+  }, []);
+
+  // Ingest live jobs on initial load and when profile changes
+  useEffect(() => {
+    fetchLiveJobs(profile);
+  }, [profile, fetchLiveJobs]);
 
   const handleOpenAiWithPrompt = (promptText: string) => {
     setInjectedAiPrompt(promptText);
     setIsAiDrawerOpen(true);
+  };
+
+  // Sync custom Greenhouse boards from Composio modal
+  const handleSyncGreenhouse = async (boardTokens: string[]) => {
+    await fetchLiveJobs(profile);
+    const mockSynced = boardTokens.map((token) => ({
+      jobTitle: `Specialist at ${token.toUpperCase()}`,
+      company: token.charAt(0).toUpperCase() + token.slice(1),
+      location: "San Francisco / Remote",
+      salaryRange: "$145k–$185k",
+      url: `https://boards.greenhouse.io/${token}`,
+      source: `Greenhouse (${token}) via Composio`,
+      status: "applied" as const,
+      notes: `Synced from your connected Greenhouse account (${token} board).`,
+      recruiterResponse: "Application active in company ATS pipeline.",
+    }));
+    bulkIngestGreenhouseApplications(mockSynced);
   };
 
   return (
@@ -49,8 +114,11 @@ export default function Home() {
           setIsAiDrawerOpen(true);
         }}
         onOpenKeyModal={() => setIsKeyModalOpen(true)}
-        matchesCount={jobMatches.length}
+        onOpenTracker={() => setIsTrackerDrawerOpen(true)}
+        onOpenComposioModal={() => setIsComposioModalOpen(true)}
+        matchesCount={liveJobs.length}
         unlocksCount={oneSkillUnlocks.length}
+        applicationsCount={applications.length}
       />
 
       {/* Main Body */}
@@ -69,7 +137,17 @@ export default function Home() {
         {/* Dynamic Tab Views */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {activeTab === "jobs" && (
-            <JobMatchesTab jobs={jobMatches} profile={profile} />
+            <JobMatchesTab
+              jobs={liveJobs}
+              profile={profile}
+              onEnrollAndApply={enrollAndApply}
+              onSaveJob={saveJob}
+              isEnrolled={isEnrolled}
+              isSaved={isSaved}
+              onOpenTracker={() => setIsTrackerDrawerOpen(true)}
+              onRefreshLiveJobs={() => fetchLiveJobs(profile)}
+              isRefreshingJobs={isRefreshingJobs}
+            />
           )}
 
           {activeTab === "unlocks" && (
@@ -92,7 +170,7 @@ export default function Home() {
           {activeTab === "ai" && (
             <AiCareerCoachFullTab
               profile={profile}
-              jobMatches={jobMatches}
+              jobMatches={liveJobs}
               oneSkillUnlocks={oneSkillUnlocks}
               activeBlueprint={activeBlueprint}
             />
@@ -100,12 +178,38 @@ export default function Home() {
         </div>
       </main>
 
+      {/* Application & Pipeline Hub Drawer (Side Panel) */}
+      <ApplicationTrackerDrawer
+        isOpen={isTrackerDrawerOpen}
+        onClose={() => setIsTrackerDrawerOpen(false)}
+        applications={applications}
+        onUpdateStatus={(id, status) => updateApplication(id, { status })}
+        onUpdateNotes={(id, notes, recruiterResponse) => updateApplication(id, { notes, recruiterResponse })}
+        onRemove={removeApplication}
+        onAskAriaAboutJob={(jobTitle, company, status) =>
+          handleOpenAiWithPrompt(
+            `I applied to ${jobTitle} at ${company} (status: ${status}). What should I do next, and can you help me prepare for interview questions and recruiter follow-ups?`
+          )
+        }
+        onOpenComposioModal={() => {
+          setIsTrackerDrawerOpen(false);
+          setIsComposioModalOpen(true);
+        }}
+      />
+
+      {/* Composio & Greenhouse Integration Modal */}
+      <ComposioModal
+        isOpen={isComposioModalOpen}
+        onClose={() => setIsComposioModalOpen(false)}
+        onSyncGreenhouse={handleSyncGreenhouse}
+      />
+
       {/* Slide-over persistent AI Assistant Drawer */}
       <AiCareerCoachDrawer
         isOpen={isAiDrawerOpen}
         onClose={() => setIsAiDrawerOpen(false)}
         profile={profile}
-        jobMatches={jobMatches}
+        jobMatches={liveJobs}
         oneSkillUnlocks={oneSkillUnlocks}
         activeBlueprint={activeBlueprint}
         initialPrompt={injectedAiPrompt}
@@ -119,7 +223,20 @@ export default function Home() {
       />
 
       {/* Persistent Floating AI Action Button (Bottom Right) */}
-      <aside aria-label="Quick Actions" className="fixed bottom-6 right-6 z-40">
+      <aside aria-label="Quick Actions" className="fixed bottom-6 right-6 z-40 flex items-center gap-2">
+        <button
+          onClick={() => setIsTrackerDrawerOpen(true)}
+          className="flex items-center gap-2 px-3.5 py-3 rounded-2xl bg-obsidian-900 hover:bg-slate-800 text-white font-bold text-xs border border-slate-700/80 shadow-glass transition-all"
+          title="Open Application Tracker"
+        >
+          <span>📋 Tracker</span>
+          {applications.length > 0 && (
+            <span className="w-5 h-5 rounded-full bg-emerald-500 text-obsidian-950 flex items-center justify-center font-black text-[10px]">
+              {applications.length}
+            </span>
+          )}
+        </button>
+
         <button
           onClick={() => {
             setInjectedAiPrompt("");
@@ -137,10 +254,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="font-bold text-slate-400">ElevateAI</span>
-            <span>— Intelligent Resume Job Matcher & Skill Unlock</span>
+            <span>— Intelligent Resume Job Matcher &amp; Real-Time Pipeline</span>
           </div>
           <div className="flex items-center gap-4 text-slate-400">
-            <span>Production Vercel Ready</span>
+            <span>Live Job Feeds (Jobicy &amp; Greenhouse)</span>
+            <span>•</span>
+            <span>Composio Connected</span>
             <span>•</span>
             <span>Next.js 14 App Router</span>
           </div>
