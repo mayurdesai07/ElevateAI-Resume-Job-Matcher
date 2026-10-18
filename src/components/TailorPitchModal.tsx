@@ -33,8 +33,29 @@ ${profile.name}
 ${profile.email || "email@example.com"}
 Portfolio / LinkedIn Profile`;
 
+  const fallbackCopy = (text: string) => {
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+    } catch (_) {}
+  };
+
   const handleCopy = () => {
-    navigator.clipboard.writeText(pitchText);
+    try {
+      if (navigator?.clipboard?.writeText) {
+        navigator.clipboard.writeText(pitchText).catch(() => fallbackCopy(pitchText));
+      } else {
+        fallbackCopy(pitchText);
+      }
+    } catch (_) {
+      fallbackCopy(pitchText);
+    }
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
   };

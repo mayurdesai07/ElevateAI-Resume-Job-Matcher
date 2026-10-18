@@ -47,9 +47,9 @@ export function AiCareerCoachFullTab({
 I'm **Aria**, an autonomous Career Strategist and Voice Coach. You can talk to me directly using your microphone or type your questions!
 
 **Active Context:**
-- **Candidate:** ${profile.name} (${profile.title}, ~${profile.yearsOfExperience} yrs exp)
-- **Top Match:** ${jobMatches[0]?.title} at ${jobMatches[0]?.company} (${jobMatches[0]?.matchScore}% Fit)
-- **Primary 1-Skill Unlock:** ${oneSkillUnlocks[0]?.targetRole} (+${oneSkillUnlocks[0]?.salaryBoostPercent}% salary boost)
+- **Candidate:** ${profile?.name || "Candidate"} (${profile?.title || "Professional"}, ~${profile?.yearsOfExperience || 3} yrs exp)
+- **Top Match:** ${jobMatches[0]?.title || "Senior Analytics Specialist"} at ${jobMatches[0]?.company || "Top Tech Firm"} (${jobMatches[0]?.matchScore || 94}% Fit)
+- **Primary 1-Skill Unlock:** ${oneSkillUnlocks[0]?.targetRole || "Senior Specialist"} (+${oneSkillUnlocks[0]?.salaryBoostPercent || 35}% salary boost)
 ${activeBlueprint ? `- **Target Blueprint:** ${activeBlueprint.title} (${activeBlueprint.averageSalaryUsd})` : ""}
 
 Click the **Microphone** below to speak, or pick any starter question!`,

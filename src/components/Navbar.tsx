@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Sparkles,
   Compass,
@@ -48,6 +48,29 @@ export function Navbar({
   applicationsCount,
 }: NavbarProps) {
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowUserDropdown(false);
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setShowUserDropdown(false);
+      }
+    };
+
+    if (showUserDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleKeyDown);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [showUserDropdown]);
 
   const isGuest = !currentUser || currentUser.isGuest;
   const displayName = currentUser ? currentUser.name : "Guest";
@@ -199,7 +222,7 @@ export function Navbar({
                 <span className="text-[10px] text-slate-400 hidden lg:inline">(or Guest)</span>
               </button>
             ) : (
-              <div className="relative">
+              <div ref={dropdownRef} className="relative">
                 <button
                   onClick={() => setShowUserDropdown(!showUserDropdown)}
                   className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-obsidian-900 hover:bg-slate-800 border border-emerald-500/40 text-xs font-semibold text-white transition-all shadow-sm"

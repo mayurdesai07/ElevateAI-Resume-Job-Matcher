@@ -19,14 +19,42 @@ const KNOWN_SKILLS = [
   "Vulnerability Scanning", "Nessus", "Cloud Security", "Firewalls"
 ];
 
-export function parseResumeText(rawText: string): ResumeProfile {
-  const textUpper = rawText.toUpperCase();
-  const lowerText = rawText.toLowerCase();
+export function parseResumeText(rawText: string, fileName?: string): ResumeProfile {
+  // Sanitize binary PDF/DOCX artifacts: keep printable ASCII and clean whitespace
+  const sanitizedText = rawText.replace(/[^\x20-\x7E\r\n\t]/g, " ").replace(/\s+/g, " ");
+  const textUpper = (sanitizedText || rawText).toUpperCase();
+  const lowerText = (sanitizedText || rawText).toLowerCase();
 
-  // Extract candidate name (first line or heuristic)
-  const lines = rawText.split("\n").map(l => l.trim()).filter(Boolean);
-  const potentialName = lines[0] ? lines[0].replace(/[^a-zA-Z\s]/g, "").trim() : "Candidate Profile";
-  const name = potentialName.length > 2 && potentialName.length < 35 ? potentialName : "ElevateAI Candidate";
+  // Extract candidate name: from first valid line or fallback to file name
+  const lines = rawText
+    .split(/[\r\n]+/)
+    .map((l) => l.trim())
+    .filter((l) => l.length > 2 && !l.startsWith("%PDF") && !l.includes("obj") && !l.includes("<<"));
+
+  let extractedName = "";
+  if (lines.length > 0) {
+    const candidate = lines[0].replace(/[^a-zA-Z\s]/g, "").trim();
+    if (candidate.length > 2 && candidate.length < 35 && !candidate.toUpperCase().includes("RESUME") && !candidate.toUpperCase().includes("CURRICULUM")) {
+      extractedName = candidate;
+    }
+  }
+
+  // If candidate name wasn't cleanly extracted from binary header, derive from filename
+  if (!extractedName && fileName) {
+    const cleanFileName = fileName
+      .replace(/\.(pdf|docx?|txt|rtf)$/i, "")
+      .replace(/[-_]/g, " ")
+      .replace(/\b(resume|cv|profile|final|updated|latest|new|202[0-9])\b/gi, "")
+      .trim();
+    if (cleanFileName.length >= 2) {
+      extractedName = cleanFileName
+        .split(/\s+/)
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+        .join(" ");
+    }
+  }
+
+  const name = extractedName || "Candidate Profile";
 
   // Email extraction
   const emailMatch = rawText.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/i);

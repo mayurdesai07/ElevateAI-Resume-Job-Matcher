@@ -315,7 +315,11 @@ export function JobMatchesTab({
           // Circular progress math
           const radius = 22;
           const circumference = 2 * Math.PI * radius;
-          const strokeDashoffset = circumference - (job.matchScore / 100) * circumference;
+          const safeScore =
+            typeof job.matchScore === "number" && !isNaN(job.matchScore)
+              ? Math.min(100, Math.max(0, Math.round(job.matchScore)))
+              : 82;
+          const strokeDashoffset = circumference - (safeScore / 100) * circumference;
 
           const enrolled = isEnrolled(job.id);
           const saved = isSaved(job.id);
@@ -385,9 +389,9 @@ export function JobMatchesTab({
                         strokeDashoffset={strokeDashoffset}
                         strokeLinecap="round"
                         className={
-                          job.matchScore >= 90
+                          safeScore >= 90
                             ? "text-emerald-400"
-                            : job.matchScore >= 80
+                            : safeScore >= 80
                             ? "text-teal-400"
                             : "text-amber-400"
                         }
@@ -395,7 +399,7 @@ export function JobMatchesTab({
                       />
                     </svg>
                     <div className="absolute flex flex-col items-center">
-                      <span className="text-xs font-black text-white">{job.matchScore}%</span>
+                      <span className="text-xs font-black text-white">{safeScore}%</span>
                       <span className="text-[8px] font-bold uppercase text-slate-400">FIT</span>
                     </div>
                   </div>

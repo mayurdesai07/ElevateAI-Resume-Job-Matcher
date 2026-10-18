@@ -119,12 +119,6 @@ export function useApplicationTracker() {
       }
 
       saveToStorage(updatedList);
-
-      // Open the job's official apply portal in a new tab if URL is available
-      if (typeof window !== "undefined" && targetRecord.url) {
-        window.open(targetRecord.url, "_blank", "noopener,noreferrer");
-      }
-
       return targetRecord;
     },
     [applications, saveToStorage]

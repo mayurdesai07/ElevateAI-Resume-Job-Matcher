@@ -33,7 +33,7 @@ export function HeroDropzone({ onProfileLoaded, activeProfile }: HeroDropzonePro
       // Heuristic text parsing
       setTimeout(() => {
         // Fallback or dynamically generate from text
-        const parsed = parseResumeText(content || file.name);
+        const parsed = parseResumeText(content || "", file.name);
         onProfileLoaded(parsed);
         setIsProcessing(false);
       }, 500);
