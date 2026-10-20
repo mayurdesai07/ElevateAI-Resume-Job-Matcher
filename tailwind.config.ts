@@ -12,6 +12,29 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        // NxtWave CCBP 4.0 Design Tokens
+        ccbp: {
+          primary: "var(--color-primary)",
+          "primary-hover": "var(--color-primary-hover)",
+          blue: "var(--color-ccbp-blue)",
+          green: "var(--color-accent-green)",
+          amber: "var(--color-accent-amber)",
+          navy: "var(--bg-navy)",
+          tint: "var(--bg-accent-tint)",
+          heading: "var(--text-heading)",
+          body: "var(--text-body)",
+          muted: "var(--text-muted)",
+          border: "var(--border-light)",
+        },
+        // Semantic background tokens
+        surface: {
+          primary: "var(--bg-primary)",
+          secondary: "var(--bg-secondary)",
+          dark: "var(--bg-dark)",
+          navy: "var(--bg-navy)",
+          tint: "var(--bg-accent-tint)",
+        },
+        // Existing support colors
         obsidian: {
           950: "#07090E",
           900: "#0D111A",
@@ -20,29 +43,26 @@ const config: Config = {
           700: "#27334D",
         },
         emerald: {
-          400: "#34D399",
-          500: "#10B981",
-          600: "#059669",
+          400: "#44C654", // NxtWave CCBP vibrant green
+          500: "#36A844",
+          600: "#2B8736",
         },
         cyan: {
-          400: "#22D3EE",
-          500: "#06B6D4",
+          400: "#0B69FF", // CCBP electric blue
+          500: "#2563EB",
         },
         indigo: {
-          400: "#818CF8",
-          500: "#6366F1",
-          600: "#4F46E5",
-        }
-      },
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-        "mesh-glow": "radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 60%), radial-gradient(circle at 100% 50%, rgba(16, 185, 129, 0.12) 0%, transparent 50%)",
+          400: "#3B82F6",
+          500: "#2563EB",
+          600: "#1D4ED8",
+        },
       },
       boxShadow: {
-        glow: "0 0 40px -10px rgba(16, 185, 129, 0.25)",
-        "glow-indigo": "0 0 40px -10px rgba(99, 102, 241, 0.3)",
-        glass: "0 8px 32px 0 rgba(0, 0, 0, 0.37)",
+        card: "var(--shadow-card)",
+        button: "var(--shadow-button)",
+        glow: "0 0 30px -5px rgba(11, 105, 255, 0.25)",
+        "glow-green": "0 0 30px -5px rgba(68, 198, 84, 0.3)",
+        glass: "0 8px 32px 0 rgba(24, 59, 86, 0.08)",
       },
     },
   },

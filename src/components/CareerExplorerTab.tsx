@@ -40,10 +40,8 @@ export function CareerExplorerTab({
   const [activeTab, setActiveTab] = useState<"overview" | "tech" | "roadmap">("overview");
   const [checkedMilestones, setCheckedMilestones] = useState<Record<string, boolean>>({});
 
-  // All blueprints
   const allBlueprints = Object.values(MASTER_CAREER_BLUEPRINTS);
 
-  // Dynamic blueprint generator if user types a custom role
   const matchedBlueprint = allBlueprints.find(
     (b) => b.id === selectedBlueprintId || b.title.toLowerCase() === selectedBlueprintId.toLowerCase()
   );
@@ -99,7 +97,6 @@ export function CareerExplorerTab({
     ]
   };
 
-  // Helper to determine if user possesses a skill
   const userHasSkill = (skillName: string): boolean => {
     const s = skillName.toLowerCase();
     const userSkills = [
@@ -119,18 +116,18 @@ export function CareerExplorerTab({
   return (
     <div className="space-y-6">
       {/* Header & Role Search */}
-      <div className="bg-obsidian-900/90 border border-slate-800 p-6 rounded-2xl shadow-glass backdrop-blur-md">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-card transition-colors duration-200">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-xs font-semibold mb-2 border border-cyan-500/20">
-              <Compass className="w-3.5 h-3.5" />
-              <span>Career Path & Role Blueprint Explorer</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-700/60 text-xs font-semibold mb-2 shadow-sm">
+              <Compass className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+              <span>CCBP Career Blueprint Explorer</span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-black text-white">
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
               The "Become Anything" Hub
             </h2>
-            <p className="text-xs text-slate-400 mt-1">
-              Explore step-by-step career blue-prints, essential tools, and compare against your active resume.
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              Explore step-by-step career blueprints, essential tools, and compare against your active resume.
             </p>
           </div>
 
@@ -142,14 +139,14 @@ export function CareerExplorerTab({
               placeholder="Search or type any role (e.g. Data Analyst)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-obsidian-950 border border-slate-700/80 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
             />
           </div>
         </div>
 
         {/* Quick Popular Pills */}
-        <div className="mt-4 flex items-center gap-2 flex-wrap text-xs pt-4 border-t border-slate-800/80">
-          <span className="text-slate-500 text-[11px] font-semibold uppercase tracking-wider">
+        <div className="mt-4 flex items-center gap-2 flex-wrap text-xs pt-4 border-t border-slate-100 dark:border-slate-800">
+          <span className="text-slate-500 dark:text-slate-400 text-[11px] font-semibold uppercase tracking-wider">
             Popular Tracks:
           </span>
           {allBlueprints.map((b) => (
@@ -159,10 +156,10 @@ export function CareerExplorerTab({
                 onSelectBlueprintId(b.id);
                 setSearchQuery("");
               }}
-              className={`px-3 py-1 rounded-lg text-xs font-medium transition-all border ${
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all border ${
                 currentBlueprint.id === b.id
-                  ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40 shadow-glow"
-                  : "bg-slate-800/60 text-slate-400 hover:text-slate-200 border-slate-700/60"
+                  ? "bg-blue-50 text-blue-700 border-blue-300 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-700 shadow-sm"
+                  : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border-slate-200 dark:border-slate-700"
               }`}
             >
               {b.title}
@@ -172,29 +169,29 @@ export function CareerExplorerTab({
       </div>
 
       {/* Selected Role Blueprint Header Card */}
-      <div className="bg-obsidian-900/95 border border-slate-800 rounded-2xl p-6 shadow-glass">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-800">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-card transition-colors duration-200">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-100 dark:border-slate-800">
           <div>
             <div className="flex items-center gap-2.5 flex-wrap">
-              <h3 className="text-2xl font-black text-white">{currentBlueprint.title}</h3>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white">{currentBlueprint.title}</h3>
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-700/60">
                 {currentBlueprint.category}
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-300 mt-2 max-w-3xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-2 max-w-3xl leading-relaxed">
               {currentBlueprint.overview}
             </p>
           </div>
 
           {/* Resume Overlay Toggle Switch */}
-          <div className="flex items-center gap-3 self-start md:self-auto bg-obsidian-950 p-2.5 rounded-xl border border-slate-800">
-            <span className="text-xs font-semibold text-slate-300">
+          <div className="flex items-center gap-3 self-start md:self-auto bg-slate-50 dark:bg-slate-800 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
               Overlay Resume Match
             </span>
             <button
               onClick={() => setOverlayResume(!overlayResume)}
               className={`w-11 h-6 rounded-full transition-colors relative p-0.5 ${
-                overlayResume ? "bg-emerald-500" : "bg-slate-700"
+                overlayResume ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-600"
               }`}
             >
               <div
@@ -208,79 +205,79 @@ export function CareerExplorerTab({
 
         {/* Quick Stats: Salary, Growth, Open Roles */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-5">
-          <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center">
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-400 dark:border-emerald-800 flex items-center justify-center">
               <DollarSign className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-[11px] text-slate-400">Average US Compensation</div>
-              <div className="text-sm font-bold text-white">{currentBlueprint.averageSalaryUsd}</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400">Average Compensation</div>
+              <div className="text-sm font-bold text-slate-900 dark:text-white">{currentBlueprint.averageSalaryUsd}</div>
             </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 flex items-center justify-center">
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/50 dark:text-blue-400 dark:border-blue-800 flex items-center justify-center">
               <TrendingUp className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-[11px] text-slate-400">Market Growth Rate</div>
-              <div className="text-sm font-bold text-white">{currentBlueprint.growthRate}</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400">Market Growth Rate</div>
+              <div className="text-sm font-bold text-slate-900 dark:text-white">{currentBlueprint.growthRate}</div>
             </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center">
+          <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-400 dark:border-indigo-800 flex items-center justify-center">
               <Layers className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-[11px] text-slate-400">Active Job Market</div>
-              <div className="text-sm font-bold text-white">{currentBlueprint.openRolesCount}</div>
+              <div className="text-[11px] text-slate-500 dark:text-slate-400">Active Job Market</div>
+              <div className="text-sm font-bold text-slate-900 dark:text-white">{currentBlueprint.openRolesCount}</div>
             </div>
           </div>
         </div>
 
         {/* Seniority Ladder */}
-        <div className="mt-4 p-4 rounded-xl bg-slate-950/50 border border-slate-800/80">
-          <div className="text-xs font-semibold text-slate-300 mb-2">Compensation by Seniority Ladder:</div>
+        <div className="mt-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700">
+          <div className="text-xs font-semibold text-slate-800 dark:text-slate-200 mb-2">Compensation by Seniority Ladder:</div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
             {currentBlueprint.seniorityLevels.map((lvl, idx) => (
-              <div key={idx} className="p-2 rounded-lg bg-obsidian-900 border border-slate-800">
-                <div className="font-semibold text-slate-200">{lvl.level}</div>
-                <div className="text-[11px] text-slate-400">{lvl.yearsExp}</div>
-                <div className="text-xs font-bold text-emerald-400 mt-1">{lvl.avgPay}</div>
+              <div key={idx} className="p-2.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm">
+                <div className="font-semibold text-slate-800 dark:text-slate-200">{lvl.level}</div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400">{lvl.yearsExp}</div>
+                <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-1">{lvl.avgPay}</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* Sub-tabs: Bento Sections */}
-        <div className="mt-6 flex items-center gap-2 border-b border-slate-800 pb-3 text-xs">
+        <div className="mt-6 flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3 text-xs">
           <button
             onClick={() => setActiveTab("overview")}
             className={`px-3.5 py-1.5 rounded-lg font-semibold transition-all ${
               activeTab === "overview"
-                ? "bg-slate-800 text-white border border-slate-700"
-                : "text-slate-400 hover:text-white"
+                ? "bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-slate-700 shadow-sm"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
             }`}
           >
-            Core Qualities & Mindset
+            Core Qualities &amp; Mindset
           </button>
           <button
             onClick={() => setActiveTab("tech")}
             className={`px-3.5 py-1.5 rounded-lg font-semibold transition-all ${
               activeTab === "tech"
-                ? "bg-slate-800 text-white border border-slate-700"
-                : "text-slate-400 hover:text-white"
+                ? "bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-slate-700 shadow-sm"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
             }`}
           >
-            Programs & Tech Stack
+            Programs &amp; Tech Stack
           </button>
           <button
             onClick={() => setActiveTab("roadmap")}
             className={`px-3.5 py-1.5 rounded-lg font-semibold transition-all ${
               activeTab === "roadmap"
-                ? "bg-slate-800 text-white border border-slate-700"
-                : "text-slate-400 hover:text-white"
+                ? "bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-slate-700 shadow-sm"
+                : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
             }`}
           >
             Step-by-Step Learning Roadmap
@@ -293,13 +290,13 @@ export function CareerExplorerTab({
             {currentBlueprint.coreQualities.map((q, idx) => (
               <div
                 key={idx}
-                className="p-4 rounded-xl bg-slate-950/70 border border-slate-800/80 hover:border-cyan-500/30 transition-all"
+                className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 transition-all shadow-sm"
               >
-                <div className="flex items-center gap-2 text-cyan-400 font-bold text-sm mb-1.5">
+                <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-sm mb-1.5">
                   <Brain className="w-4 h-4" />
                   <span>{q.name}</span>
                 </div>
-                <p className="text-xs text-slate-300 leading-relaxed">{q.description}</p>
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">{q.description}</p>
               </div>
             ))}
           </div>
@@ -318,15 +315,15 @@ export function CareerExplorerTab({
                     <span
                       className={`px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider ${
                         level === "Beginner"
-                          ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800"
                           : level === "Intermediate"
-                          ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"
-                          : "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20"
+                          ? "bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-800"
+                          : "bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-300 dark:border-indigo-800"
                       }`}
                     >
                       {level} Stack
                     </span>
-                    <span className="text-xs text-slate-500">
+                    <span className="text-xs text-slate-500 dark:text-slate-400">
                       {level === "Beginner"
                         ? "Must-have foundational tooling"
                         : level === "Intermediate"
@@ -342,29 +339,29 @@ export function CareerExplorerTab({
                       return (
                         <div
                           key={idx}
-                          className={`p-3.5 rounded-xl border text-xs flex flex-col justify-between transition-all ${
+                          className={`p-3.5 rounded-xl border text-xs flex flex-col justify-between transition-all shadow-sm ${
                             hasSkill
-                              ? "bg-emerald-950/20 border-emerald-500/40"
-                              : "bg-slate-950/60 border-slate-800"
+                              ? "bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-300 dark:border-emerald-700"
+                              : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
                           }`}
                         >
                           <div>
                             <div className="flex items-center justify-between gap-2 mb-1">
-                              <span className="font-bold text-slate-200">{skill.name}</span>
+                              <span className="font-bold text-slate-800 dark:text-slate-200">{skill.name}</span>
                               {overlayResume && (
                                 <span
                                   className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                                     hasSkill
-                                      ? "bg-emerald-500/20 text-emerald-300"
-                                      : "bg-amber-500/10 text-amber-400"
+                                      ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300"
+                                      : "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300"
                                   }`}
                                 >
                                   {hasSkill ? "✓ On Resume" : "To Learn"}
                                 </span>
                               )}
                             </div>
-                            <div className="text-[11px] text-slate-400 mb-1.5">{skill.category}</div>
-                            <p className="text-[11px] text-slate-300 leading-relaxed">
+                            <div className="text-[11px] text-slate-500 dark:text-slate-400 mb-1.5">{skill.category}</div>
+                            <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
                               {skill.description}
                             </p>
                           </div>
@@ -381,7 +378,7 @@ export function CareerExplorerTab({
         {/* Tab 3: Step-by-Step Learning Roadmap */}
         {activeTab === "roadmap" && (
           <div className="mt-5 space-y-6">
-            <div className="text-xs text-slate-400">
+            <div className="text-xs text-slate-500 dark:text-slate-400">
               Follow this interactive 4-phase timeline. Check off milestones as you master them to track progress.
             </div>
 
@@ -389,25 +386,25 @@ export function CareerExplorerTab({
               {currentBlueprint.roadmap.map((phase) => (
                 <div
                   key={phase.phaseNumber}
-                  className="p-5 rounded-2xl bg-slate-950/70 border border-slate-800/80 hover:border-cyan-500/30 transition-all"
+                  className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 transition-all shadow-sm"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-200 dark:border-slate-700">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-bold flex items-center justify-center text-xs">
+                      <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-700/60 font-bold flex items-center justify-center text-xs">
                         {phase.phaseNumber}
                       </div>
-                      <h4 className="text-sm font-bold text-white">{phase.phaseName}</h4>
+                      <h4 className="text-sm font-bold text-slate-900 dark:text-white">{phase.phaseName}</h4>
                     </div>
-                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                       {phase.durationWeeks}
                     </span>
                   </div>
 
-                  <p className="text-xs text-slate-300 mt-2.5 font-medium">{phase.objective}</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 mt-2.5 font-medium">{phase.objective}</p>
 
                   {/* Milestones list with checkboxes */}
                   <div className="mt-3.5 space-y-2">
-                    <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                       Phase Milestones:
                     </div>
                     {phase.keyMilestones.map((milestone, idx) => {
@@ -418,17 +415,17 @@ export function CareerExplorerTab({
                         <div
                           key={idx}
                           onClick={() => toggleMilestone(key)}
-                          className={`cursor-pointer p-2 rounded-lg flex items-start gap-2.5 text-xs transition-colors ${
+                          className={`cursor-pointer p-2.5 rounded-xl flex items-start gap-2.5 text-xs transition-colors shadow-sm ${
                             isChecked
-                              ? "bg-emerald-950/30 border border-emerald-500/30 text-emerald-300 line-through"
-                              : "bg-obsidian-900/60 border border-slate-800 text-slate-300 hover:border-slate-700"
+                              ? "bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 line-through"
+                              : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-blue-300 dark:hover:border-slate-600"
                           }`}
                         >
                           <div className="shrink-0 mt-0.5">
                             {isChecked ? (
-                              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                             ) : (
-                              <Circle className="w-4 h-4 text-slate-600" />
+                              <Circle className="w-4 h-4 text-slate-400" />
                             )}
                           </div>
                           <span>{milestone}</span>
@@ -438,13 +435,13 @@ export function CareerExplorerTab({
                   </div>
 
                   {/* Recommended Projects */}
-                  <div className="mt-3 pt-3 border-t border-slate-800/80">
-                    <div className="text-[11px] text-slate-400 flex items-center gap-1.5 flex-wrap">
-                      <span className="font-semibold text-slate-300">Phase Proof Projects:</span>
+                  <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                    <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5 flex-wrap">
+                      <span className="font-semibold text-slate-700 dark:text-slate-300">Phase Proof Projects:</span>
                       {phase.recommendedProjects.map((proj, idx) => (
                         <span
                           key={idx}
-                          className="px-2 py-0.5 rounded bg-slate-800 text-cyan-300 font-mono text-[11px]"
+                          className="px-2 py-0.5 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 font-mono text-[11px]"
                         >
                           {proj}
                         </span>
@@ -458,9 +455,9 @@ export function CareerExplorerTab({
         )}
 
         {/* Bottom AI Prompt Action */}
-        <div className="mt-6 pt-5 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="text-xs text-slate-400">
-            Have questions about transitioning into <strong className="text-white">{currentBlueprint.title}</strong>?
+        <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="text-xs text-slate-500 dark:text-slate-400">
+            Have questions about transitioning into <strong className="text-slate-900 dark:text-white font-semibold">{currentBlueprint.title}</strong>?
           </div>
           <button
             onClick={() =>
@@ -468,10 +465,10 @@ export function CareerExplorerTab({
                 `I want to become a ${currentBlueprint.title}. Based on my current resume as ${profile.title}, create a realistic weekly study schedule and tell me which of my current skills will transfer best.`
               )
             }
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-obsidian-950 transition-all shadow-glow"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-button hover:scale-[1.02]"
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Generate Custom {currentBlueprint.title} Study Plan with Aria</span>
+            <span>Generate Custom {currentBlueprint.title} Study Plan with Zara</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>

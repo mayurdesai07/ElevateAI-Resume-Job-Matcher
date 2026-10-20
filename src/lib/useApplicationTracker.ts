@@ -21,7 +21,7 @@ const INITIAL_DEMO_APPLICATIONS: JobApplication[] = [
     source: "Greenhouse (Figma)",
     notes: "Applied with tailored resume pitch. Recruiter Sarah sent scheduling link for 30-min technical screening call.",
     recruiterResponse: "Screening Interview Scheduled for Thursday, 2:00 PM EST.",
-    nextStep: "Review SQL Window functions & Dashboard Case Studies with Aria AI.",
+    nextStep: "Review SQL Window functions & Dashboard Case Studies with Zara AI.",
   },
   {
     id: "app-demo-2",
@@ -113,7 +113,7 @@ export function useApplicationTracker() {
           source: job.source || "ElevateAI Verified Market",
           notes: "Direct 1-Click enrollment recorded. Ready to track recruiter response.",
           recruiterResponse: "Application submitted; awaiting response from hiring team.",
-          nextStep: "Review company case studies & prepare interview questions with Aria AI.",
+          nextStep: "Review company case studies & prepare interview questions with Zara AI.",
         };
         updatedList = [targetRecord, ...applications];
       }

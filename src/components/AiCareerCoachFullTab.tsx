@@ -44,7 +44,7 @@ export function AiCareerCoachFullTab({
       role: "assistant",
       content: `### 🎯 Welcome to your Voice-Enabled AI Career Studio!
 
-I'm **Aria**, an autonomous Career Strategist and Voice Coach. You can talk to me directly using your microphone or type your questions!
+I'm **Zara**, an autonomous Career Strategist, Talent Architect, and Voice Coach. You can talk to me directly using your microphone or type your questions!
 
 **Active Context:**
 - **Candidate:** ${profile?.name || "Candidate"} (${profile?.title || "Professional"}, ~${profile?.yearsOfExperience || 3} yrs exp)
@@ -55,10 +55,10 @@ ${activeBlueprint ? `- **Target Blueprint:** ${activeBlueprint.title} (${activeB
 Click the **Microphone** below to speak, or pick any starter question!`,
       timestamp: "Just now",
       suggestedPrompts: [
-        "Why am I missing out on Senior roles right now?",
-        "I want to become a Data Analyst in 3 months—give me a weekly study schedule based on my current resume.",
-        "Rewrite my resume bullet points to highlight my technical projects.",
-        "What questions will hiring managers ask me for a Senior Data Analyst role?"
+        "What are the skills which I lack for getting a new job?",
+        "Give me the jobs which are only one skill away from me.",
+        "What if I have Snowflake—would I get this job?",
+        "Rewrite my resume bullet points using the Google XYZ formula."
       ],
     },
   ]);
@@ -133,7 +133,7 @@ Click the **Microphone** below to speak, or pick any starter question!`,
     }
     resetTranscript();
 
-    // Stop speaking if Aria is talking
+    // Stop speaking if Zara is talking
     if (isSpeaking) {
       stopSpeaking();
       setCurrentlySpeakingId(null);
@@ -190,7 +190,7 @@ Click the **Microphone** below to speak, or pick any starter question!`,
 
       setMessages((prev) => [...prev, assistantMessage]);
 
-      // Automatically speak Aria's response if user used the mic!
+      // Automatically speak Zara's response if user used the mic!
       if (usedVoiceRef.current) {
         setCurrentlySpeakingId(assistantMessage.id);
         speakText(replyContent, () => {
@@ -256,41 +256,41 @@ Click the **Microphone** below to speak, or pick any starter question!`,
       {/* Left Sidebar: Active Context & Quick Strategies */}
       <div className="lg:col-span-1 space-y-4">
         {/* Active Context Card */}
-        <div className="p-4 rounded-2xl bg-obsidian-900 border border-slate-800 shadow-glass">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
-            <Brain className="w-4 h-4 text-emerald-400" />
-            <span>Active AI Context</span>
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
+            <Brain className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <span className="text-[#183B56] dark:text-white font-bold">Active AI Context</span>
           </div>
 
           <div className="space-y-2.5 text-xs">
             <div>
-              <span className="text-slate-400">Candidate:</span>
-              <div className="font-bold text-white">{profile.name}</div>
+              <span className="text-slate-500 dark:text-slate-400">Candidate:</span>
+              <div className="font-bold text-[#183B56] dark:text-white">{profile.name}</div>
             </div>
             <div>
-              <span className="text-slate-400">Current Role:</span>
-              <div className="font-semibold text-emerald-400">{profile.title}</div>
+              <span className="text-slate-500 dark:text-slate-400">Current Role:</span>
+              <div className="font-semibold text-blue-600 dark:text-blue-400">{profile.title}</div>
             </div>
             <div>
-              <span className="text-slate-400">Top 1-Skill Target:</span>
-              <div className="font-semibold text-amber-400">
+              <span className="text-slate-500 dark:text-slate-400">Top 1-Skill Target:</span>
+              <div className="font-semibold text-amber-600 dark:text-amber-400">
                 {oneSkillUnlocks[0]?.targetRole || "Senior Specialist"}
               </div>
             </div>
             {activeBlueprint && (
               <div>
-                <span className="text-slate-400">Viewed Blueprint:</span>
-                <div className="font-semibold text-cyan-400">{activeBlueprint.title}</div>
+                <span className="text-slate-500 dark:text-slate-400">Viewed Blueprint:</span>
+                <div className="font-semibold text-[#0B69FF] dark:text-blue-400">{activeBlueprint.title}</div>
               </div>
             )}
           </div>
         </div>
 
         {/* Quick Launch Questions */}
-        <div className="p-4 rounded-2xl bg-obsidian-900 border border-slate-800 shadow-glass">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
-            <Sparkles className="w-4 h-4 text-indigo-400" />
-            <span>Instant Strategies</span>
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">
+            <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <span className="text-[#183B56] dark:text-white font-bold">Instant Strategies</span>
           </div>
 
           <div className="space-y-2">
@@ -303,9 +303,9 @@ Click the **Microphone** below to speak, or pick any starter question!`,
               <button
                 key={i}
                 onClick={() => handleSendMessage(btn.label)}
-                className="w-full text-left p-2.5 rounded-xl bg-slate-950/70 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-xs text-slate-300 transition-colors flex items-center gap-2"
+                className="w-full text-left p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 hover:bg-blue-50 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2 font-medium"
               >
-                <btn.icon className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <btn.icon className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
                 <span className="line-clamp-1">{btn.label}</span>
               </button>
             ))}
@@ -314,36 +314,36 @@ Click the **Microphone** below to speak, or pick any starter question!`,
       </div>
 
       {/* Main Chat Interface */}
-      <div className="lg:col-span-3 bg-obsidian-900/90 border border-slate-800 rounded-2xl shadow-glass flex flex-col h-[700px]">
+      <div className="lg:col-span-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm flex flex-col h-[700px]">
         {/* Chat Header */}
-        <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-indigo-600 flex items-center justify-center text-white shadow-glow">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-button">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-white text-sm">Aria — Voice Career Strategist</h3>
-                <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
+                <h3 className="font-bold text-[#183B56] dark:text-white text-sm">Zara — Voice Career Strategist</h3>
+                <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60 font-bold">
                   READY
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400">
-                Tap the microphone to talk with Aria, or type any career and interview question.
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                Tap the microphone to talk with Zara, or type any career and interview question.
               </p>
             </div>
           </div>
 
           {/* Audio State Banner */}
           {isSpeaking && (
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold animate-pulse">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 text-xs font-semibold animate-pulse">
               <Volume2 className="w-4 h-4 animate-bounce" />
-              <span>Aria Speaking...</span>
+              <span>Zara Speaking...</span>
             </div>
           )}
 
           {isListening && (
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-semibold animate-pulse">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-xs font-semibold animate-pulse">
               <Mic className="w-4 h-4 animate-bounce" />
               <span>Listening to Voice...</span>
             </div>
@@ -352,8 +352,8 @@ Click the **Microphone** below to speak, or pick any starter question!`,
 
         {/* Error notification if mic access was blocked */}
         {voiceError && (
-          <div className="p-3 bg-rose-950/40 border-b border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+          <div className="p-3 bg-rose-50 dark:bg-rose-950/40 border-b border-rose-200 dark:border-rose-800/60 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
             <span className="flex-1">{voiceError}</span>
           </div>
         )}
@@ -368,7 +368,7 @@ Click the **Microphone** below to speak, or pick any starter question!`,
               }`}
             >
               {m.role === "assistant" && (
-                <div className="w-8 h-8 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800/60 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
                   <Bot className="w-4 h-4" />
                 </div>
               )}
@@ -376,8 +376,8 @@ Click the **Microphone** below to speak, or pick any starter question!`,
               <div
                 className={`p-4 rounded-2xl max-w-[85%] leading-relaxed relative group ${
                   m.role === "user"
-                    ? "bg-emerald-500 text-obsidian-950 font-medium rounded-tr-none shadow-glow text-sm"
-                    : "bg-obsidian-950 border border-slate-800 text-slate-200 rounded-tl-none whitespace-pre-wrap"
+                    ? "bg-blue-600 text-white font-medium rounded-tr-none shadow-button text-sm"
+                    : "bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 rounded-tl-none whitespace-pre-wrap"
                 }`}
               >
                 {/* Action buttons (Copy + Speak) */}
@@ -386,22 +386,22 @@ Click the **Microphone** below to speak, or pick any starter question!`,
                     <button
                       onClick={() => toggleSpeechForMessage(m)}
                       title={isSpeaking && currentlySpeakingId === m.id ? "Stop voice" : "Read aloud"}
-                      className="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white"
+                      className="p-1.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-white shadow-sm"
                     >
                       {isSpeaking && currentlySpeakingId === m.id ? (
-                        <VolumeX className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
+                        <VolumeX className="w-3.5 h-3.5 text-rose-500 animate-pulse" />
                       ) : (
-                        <Volume2 className="w-3.5 h-3.5 hover:text-emerald-400" />
+                        <Volume2 className="w-3.5 h-3.5 hover:text-blue-600 dark:hover:text-blue-400" />
                       )}
                     </button>
 
                     <button
                       onClick={() => copyToClipboard(m.content, m.id)}
                       title="Copy text"
-                      className="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white"
+                      className="p-1.5 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-500 dark:text-slate-300 hover:text-blue-600 dark:hover:text-white shadow-sm"
                     >
                       {copiedId === m.id ? (
-                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                       ) : (
                         <Copy className="w-3.5 h-3.5" />
                       )}
@@ -413,12 +413,12 @@ Click the **Microphone** below to speak, or pick any starter question!`,
 
                 {/* Suggested prompt chips */}
                 {m.suggestedPrompts && (
-                  <div className="mt-4 pt-3 border-t border-slate-800/80 flex flex-wrap gap-2">
+                  <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700 flex flex-wrap gap-2">
                     {m.suggestedPrompts.map((chip, idx) => (
                       <button
                         key={idx}
                         onClick={() => handleSendMessage(chip)}
-                        className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-[11px] text-slate-300 transition-colors"
+                        className="px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 hover:bg-blue-50 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-700 dark:text-slate-300 transition-colors font-medium"
                       >
                         ⚡ {chip}
                       </button>
@@ -428,7 +428,7 @@ Click the **Microphone** below to speak, or pick any starter question!`,
               </div>
 
               {m.role === "user" && (
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
                   <User className="w-4 h-4" />
                 </div>
               )}
@@ -436,11 +436,11 @@ Click the **Microphone** below to speak, or pick any starter question!`,
           ))}
 
           {isLoading && (
-            <div className="flex gap-3 text-xs items-center text-slate-400">
-              <div className="w-8 h-8 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+            <div className="flex gap-3 text-xs items-center text-slate-500 dark:text-slate-400">
+              <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800/60 flex items-center justify-center text-blue-600 dark:text-blue-400">
                 <RefreshCw className="w-4 h-4 animate-spin" />
               </div>
-              <span>Aria is analyzing your voice prompt and career data...</span>
+              <span>Zara is analyzing your voice prompt and career data...</span>
             </div>
           )}
 
@@ -448,7 +448,7 @@ Click the **Microphone** below to speak, or pick any starter question!`,
         </div>
 
         {/* Input Form with 1-Click Microphone Button */}
-        <div className="p-4 border-t border-slate-800 bg-obsidian-950 rounded-b-2xl">
+        <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-950/60 rounded-b-2xl">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -460,11 +460,11 @@ Click the **Microphone** below to speak, or pick any starter question!`,
             <button
               type="button"
               onClick={handleMicToggle}
-              title={isListening ? "Stop and send voice message" : "Click to speak with Aria"}
+              title={isListening ? "Stop and send voice message" : "Click to speak with Zara"}
               className={`p-3 rounded-xl border transition-all flex items-center justify-center relative ${
                 isListening
-                  ? "bg-rose-500 text-white border-rose-400 shadow-glow animate-pulse scale-105"
-                  : "bg-obsidian-900 hover:bg-slate-800 border-slate-700 text-slate-300 hover:text-emerald-400 hover:border-emerald-500/40"
+                  ? "bg-rose-500 text-white border-rose-400 shadow-md animate-pulse scale-105"
+                  : "bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 shadow-sm"
               }`}
             >
               <Mic className={`w-5 h-5 ${isListening ? "animate-bounce" : ""}`} />
@@ -482,17 +482,17 @@ Click the **Microphone** below to speak, or pick any starter question!`,
               }
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              className={`flex-1 px-4 py-3 text-xs rounded-xl bg-obsidian-900 border transition-all text-white placeholder-slate-500 focus:outline-none ${
+              className={`flex-1 px-4 py-3 text-xs rounded-xl bg-white dark:bg-slate-900 border transition-all text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none ${
                 isListening
-                  ? "border-rose-500 bg-rose-950/20 text-rose-200"
-                  : "border-slate-700/80 focus:border-emerald-500"
+                  ? "border-rose-500 bg-rose-50/50 dark:bg-rose-950/20 text-rose-700 dark:text-rose-200"
+                  : "border-slate-200 dark:border-slate-700 focus:border-blue-500"
               }`}
             />
 
             <button
               type="submit"
               disabled={!input.trim() || isLoading}
-              className="px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:brightness-110 text-obsidian-950 font-bold disabled:opacity-40 transition-all shadow-glow flex items-center gap-2"
+              className="px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold disabled:opacity-40 transition-all shadow-button flex items-center gap-2"
             >
               <span>Send</span>
               <Send className="w-4 h-4" />
@@ -500,12 +500,12 @@ Click the **Microphone** below to speak, or pick any starter question!`,
           </form>
 
           {/* Clean voice status hint */}
-          <div className="mt-2.5 flex items-center justify-between text-[11px] text-slate-400 px-1">
+          <div className="mt-2.5 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 px-1">
             <span>
               {isListening ? (
-                <strong className="text-rose-400">🎙️ Live Recording: Speak now, then tap mic or send</strong>
+                <strong className="text-rose-600 dark:text-rose-400">🎙️ Live Recording: Speak now, then tap mic or send</strong>
               ) : (
-                "🎙️ 1-Click Voice AI: Click the mic and speak naturally. Aria transcribes and speaks back to you."
+                "🎙️ 1-Click Voice AI: Click the mic and speak naturally. Zara transcribes and speaks back to you."
               )}
             </span>
           </div>

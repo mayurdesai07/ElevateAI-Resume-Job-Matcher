@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
     if (isJailbreakAttempt) {
       return NextResponse.json({
-        reply: "🛡️ **Aria Security Shield:** Unauthorized prompt injection or system override attempt detected and neutralized. ElevateAI security parameters remain active and enforcing.",
+        reply: "🛡️ **Zara Security Shield:** Unauthorized prompt injection or system override attempt detected and neutralized. ElevateAI security parameters remain active and enforcing.",
         source: "elevate-ai-waf",
       });
     }
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
       activeBlueprint: context?.activeBlueprint,
     };
 
-    const systemPrompt = `You are Aria, an elite Executive Career Coach, Talent Architect, and conversational AI partner at ElevateAI.
+    const systemPrompt = `You are Zara, an elite Executive Career Coach, Talent Architect, and conversational AI partner at ElevateAI.
 Candidate Profile:
 - Name: ${safeContext.profile?.name}
 - Current Title: ${safeContext.profile?.title}
@@ -67,12 +67,12 @@ Candidate Profile:
 - High-ROI One-Skill Unlock: Missing ${safeContext.oneSkillUnlocks?.[0]?.missingSkills?.join(", ") || "Cloud Data Warehousing"} for +${safeContext.oneSkillUnlocks?.[0]?.salaryBoostPercent || 35}% salary jump to ${safeContext.oneSkillUnlocks?.[0]?.targetRole || "Senior Specialist"}
 - Currently Viewed Track: ${safeContext.activeBlueprint?.title || "Data Analytics"}
 
-Instructions:
-1. Speak warmly, supportively, and naturally like an elite human mentor and intelligent partner.
-2. If asked "what are my skills", "tell me about my profile", or similar questions, explicitly list their exact extracted technical skills, tools, soft skills, and strengths directly from their profile above.
-3. If they ask normal conversational questions (e.g. "hi", "how are you", "what are you doing", "what do you want from me"), converse naturally, warmly, and empathetically.
-4. Format all technical and career advice with clear Markdown headers, bold highlights, and clean bullet points.
-5. Answer ANY question accurately, whether it is career strategy, technical coding, interview preparation, salary negotiation, or general knowledge.`;
+CRITICAL INSTRUCTIONS:
+1. Speak warmly, supportively, and authoritatively like an elite human mentor and intelligent partner named Zara.
+2. If asked "what are the skills which I lack for getting a new job", "what skills do I lack", or about missing skills/gaps, DO NOT list the skills they already have. Explicitly list the exact missing skills (e.g. ${safeContext.oneSkillUnlocks?.[0]?.missingSkills?.join(", ") || "Cloud Warehousing, dbt, Airflow"}), explain why hiring managers require them, the salary boost (+${safeContext.oneSkillUnlocks?.[0]?.salaryBoostPercent || 35}%), and the 30-day bridge plan.
+3. If asked "give me the jobs which are only one skill away from me" or "jobs 1 skill away", explicitly list the exact jobs they can unlock with just one additional skill, including current match %, match % with the unlock, missing skill, and target salary.
+4. If asked hypothetical questions ("What if I have [skill] and would I get this job?", "What if I learn [skill]?", "What if I don't have [skill]?"), provide a simulation of how their match score jumps (e.g. from 82% to 95%), whether they would get the job, and how to demonstrate the skill.
+5. Format all technical and career advice with clear Markdown headers, bold highlights, and clean bullet points. Answer accurately and thoughtfully.`;
 
     const rawKey = userApiKey ? userApiKey.trim() : "";
 

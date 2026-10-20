@@ -157,7 +157,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-obsidian-950 text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-obsidian-950">
+    <div className="min-h-screen bg-surface-secondary text-ccbp-body flex flex-col selection:bg-blue-600 selection:text-white transition-colors duration-200">
       {/* Top Navigation */}
       <Navbar
         activeTab={activeTab}
@@ -290,13 +290,13 @@ export default function Home() {
 
       {/* Resume Saved Forever Toast Notification */}
       {savedResumeToast && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 p-3.5 px-5 rounded-2xl bg-obsidian-900 border border-emerald-500/60 shadow-glow text-white text-xs flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
-          <div className="w-6 h-6 rounded-lg bg-emerald-500 text-obsidian-950 flex items-center justify-center font-black">
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 p-3.5 px-5 rounded-2xl bg-white dark:bg-slate-900 border border-emerald-500/50 shadow-xl text-slate-800 dark:text-white text-xs flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="w-6 h-6 rounded-lg bg-emerald-500 text-white flex items-center justify-center font-black">
             ✓
           </div>
           <div>
-            <div className="font-bold text-emerald-400">Resume Stored &amp; Remembered!</div>
-            <div className="text-slate-300">
+            <div className="font-bold text-emerald-600 dark:text-emerald-400">Resume Stored &amp; Remembered!</div>
+            <div className="text-slate-600 dark:text-slate-300">
               {currentUser && !currentUser.isGuest
                 ? `Linked permanently to ${currentUser.email} (${currentUser.name})`
                 : "Saved to your active session — Create a free account anytime to access across devices."}
@@ -309,12 +309,12 @@ export default function Home() {
       <aside aria-label="Quick Actions" className="fixed bottom-6 right-6 z-40 flex items-center gap-2">
         <button
           onClick={() => setIsTrackerDrawerOpen(true)}
-          className="flex items-center gap-2 px-3.5 py-3 rounded-2xl bg-obsidian-900 hover:bg-slate-800 text-white font-bold text-xs border border-slate-700/80 shadow-glass transition-all"
+          className="flex items-center gap-2 px-3.5 py-3 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-white font-bold text-xs border border-slate-200 dark:border-slate-700 shadow-md transition-all hover:scale-105"
           title="Open Application Tracker"
         >
           <span>📋 Tracker</span>
           {applications.length > 0 && (
-            <span className="w-5 h-5 rounded-full bg-emerald-500 text-obsidian-950 flex items-center justify-center font-black text-[10px]">
+            <span className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black text-[10px]">
               {applications.length}
             </span>
           )}
@@ -325,21 +325,21 @@ export default function Home() {
             setInjectedAiPrompt("");
             setIsAiDrawerOpen(true);
           }}
-          className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 hover:scale-105 text-white font-bold text-xs shadow-glow transition-all"
+          className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 hover:scale-105 text-white font-bold text-xs shadow-button transition-all"
         >
-          <Sparkles className="w-4 h-4 text-emerald-200 animate-pulse" />
-          <span>Ask Aria AI</span>
+          <Sparkles className="w-4 h-4 text-blue-200 animate-pulse" />
+          <span>Ask Zara AI</span>
         </button>
       </aside>
 
       {/* Footer */}
-      <footer className="border-t border-slate-900 bg-obsidian-950 py-8 text-xs text-slate-500 text-center">
+      <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-8 text-xs text-slate-500 dark:text-slate-400 text-center transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-slate-400">ElevateAI</span>
-            <span>— Intelligent Resume Job Matcher &amp; Real-Time Pipeline</span>
+            <span className="font-bold text-slate-900 dark:text-white">ElevateAI</span>
+            <span>— NxtWave (CCBP 4.0) Intelligent Resume Job Matcher</span>
           </div>
-          <div className="flex items-center gap-4 text-slate-400">
+          <div className="flex items-center gap-4 text-slate-500 dark:text-slate-400">
             <span>Live Job Feeds (Jobicy &amp; Greenhouse)</span>
             <span>•</span>
             <span>Composio Connected</span>

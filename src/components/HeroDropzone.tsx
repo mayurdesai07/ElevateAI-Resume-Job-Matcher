@@ -30,9 +30,7 @@ export function HeroDropzone({ onProfileLoaded, activeProfile }: HeroDropzonePro
 
     reader.onload = (event) => {
       const content = event.target?.result as string;
-      // Heuristic text parsing
       setTimeout(() => {
-        // Fallback or dynamically generate from text
         const parsed = parseResumeText(content || "", file.name);
         onProfileLoaded(parsed);
         setIsProcessing(false);
@@ -43,11 +41,9 @@ export function HeroDropzone({ onProfileLoaded, activeProfile }: HeroDropzonePro
       setIsProcessing(false);
     };
 
-    // If text file
     if (file.type.includes("text") || file.name.endsWith(".txt")) {
       reader.readAsText(file);
     } else {
-      // For binary files like PDF / DOCX, extract text representation or load rich sample
       reader.readAsText(file);
     }
   };
@@ -76,28 +72,28 @@ export function HeroDropzone({ onProfileLoaded, activeProfile }: HeroDropzonePro
   return (
     <div className="relative pt-6 pb-8 overflow-hidden">
       {/* Background radial glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-r from-emerald-500/10 via-indigo-500/10 to-cyan-500/10 blur-[100px] pointer-events-none -z-10 rounded-full" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-teal-500/10 blur-[100px] pointer-events-none -z-10 rounded-full" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        {/* Top announcement pill */}
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/60 text-xs text-slate-300 mb-5 shadow-sm">
-          <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-          <span className="font-semibold text-emerald-400">One-Skill Unlock 2.0</span>
-          <span className="text-slate-500">·</span>
+        {/* NxtWave CCBP Announcement Pill */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 dark:bg-slate-800 border border-blue-200/80 dark:border-slate-700 text-xs text-blue-700 dark:text-blue-300 mb-5 shadow-sm">
+          <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+          <span className="font-bold text-blue-600 dark:text-blue-400">CCBP 4.0 Career Engine</span>
+          <span className="text-slate-400">·</span>
           <span>Find roles paying +35% where you're only missing 1 skill</span>
           <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
         </div>
 
         {/* Hero Headline */}
-        <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white max-w-4xl mx-auto leading-[1.15]">
+        <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-4xl mx-auto leading-[1.15]">
           Find Jobs Fitted to Your Resume. <br />
-          <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 dark:from-blue-400 dark:via-cyan-300 dark:to-indigo-400 bg-clip-text text-transparent">
             Unlock High-Paying Roles With Just 1 Skill.
           </span>
         </h1>
 
-        <p className="mt-4 text-sm sm:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
-          Upload your resume to discover instant direct job matches, pinpoint the exact single skill holding you back from a 35%+ salary boost, and get guided by <strong className="text-slate-200">Aria</strong>, your AI career coach.
+        <p className="mt-4 text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
+          Upload your resume to discover instant direct job matches, pinpoint the exact single skill holding you back from a 35%+ salary boost, and get guided by <strong className="text-slate-900 dark:text-white font-semibold">Zara</strong>, your AI career coach.
         </p>
 
         {/* Upload / Quick Test Container */}
@@ -112,9 +108,9 @@ export function HeroDropzone({ onProfileLoaded, activeProfile }: HeroDropzonePro
             onClick={() => fileInputRef.current?.click()}
             className={`cursor-pointer relative rounded-2xl border-2 border-dashed p-7 transition-all ${
               isDragging
-                ? "border-emerald-400 bg-emerald-500/10 scale-[1.01]"
-                : "border-slate-700/80 hover:border-emerald-500/50 bg-obsidian-900/60 hover:bg-obsidian-900/90"
-            } glass-panel shadow-glass group`}
+                ? "border-blue-600 bg-blue-50/80 dark:bg-blue-950/40 scale-[1.01]"
+                : "border-slate-300 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 bg-white dark:bg-slate-800/80 hover:bg-slate-50/80 dark:hover:bg-slate-800 shadow-card"
+            } group`}
           >
             <input
               ref={fileInputRef}
@@ -125,24 +121,24 @@ export function HeroDropzone({ onProfileLoaded, activeProfile }: HeroDropzonePro
             />
 
             <div className="flex flex-col items-center justify-center text-center">
-              <div className="w-12 h-12 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform group-hover:border-emerald-500/40">
+              <div className="w-12 h-12 rounded-xl bg-blue-50 dark:bg-slate-700 border border-blue-100 dark:border-slate-600 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform group-hover:border-blue-300 dark:group-hover:border-blue-400 shadow-sm">
                 {isProcessing ? (
-                  <RefreshCw className="w-6 h-6 text-emerald-400 animate-spin" />
+                  <RefreshCw className="w-6 h-6 text-blue-600 dark:text-blue-400 animate-spin" />
                 ) : (
-                  <UploadCloud className="w-6 h-6 text-emerald-400" />
+                  <UploadCloud className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                 )}
               </div>
 
-              <div className="text-sm font-semibold text-slate-200">
+              <div className="text-sm font-semibold text-slate-900 dark:text-white">
                 {isProcessing ? (
                   "Analyzing resume & matching live job markets..."
                 ) : (
                   <>
-                    <span className="text-emerald-400 underline underline-offset-2">Click to upload resume</span> or drag & drop
+                    <span className="text-blue-600 dark:text-blue-400 underline underline-offset-2">Click to upload resume</span> or drag &amp; drop
                   </>
                 )}
               </div>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 Supports PDF, DOCX, or TXT (ATS parsed securely)
               </p>
             </div>
@@ -153,22 +149,22 @@ export function HeroDropzone({ onProfileLoaded, activeProfile }: HeroDropzonePro
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowPasteModal(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-colors shadow-sm"
               >
-                <ClipboardList className="w-3.5 h-3.5 text-cyan-400" />
+                <ClipboardList className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                 <span>Paste Resume Text</span>
               </button>
             </div>
 
             {/* Instant Sample Selectors */}
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-slate-400 hidden sm:inline">Try Sample:</span>
+              <span className="text-slate-500 dark:text-slate-400 hidden sm:inline font-medium">Try Sample:</span>
               <button
                 onClick={() => onProfileLoaded(SAMPLE_RESUMES.alex_data_analyst)}
-                className={`px-2.5 py-1 rounded-md transition-all font-medium border ${
+                className={`px-2.5 py-1 rounded-lg transition-all font-semibold border ${
                   activeProfile.name === "Alex Rivera"
-                    ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
-                    : "bg-slate-900/80 text-slate-400 hover:text-slate-200 border-slate-800"
+                    ? "bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700 shadow-sm"
+                    : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border-slate-200 dark:border-slate-700"
                 }`}
               >
                 📊 Data Analyst
@@ -176,10 +172,10 @@ export function HeroDropzone({ onProfileLoaded, activeProfile }: HeroDropzonePro
 
               <button
                 onClick={() => onProfileLoaded(SAMPLE_RESUMES.sarah_fullstack_dev)}
-                className={`px-2.5 py-1 rounded-md transition-all font-medium border ${
+                className={`px-2.5 py-1 rounded-lg transition-all font-semibold border ${
                   activeProfile.name === "Sarah Chen"
-                    ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/40"
-                    : "bg-slate-900/80 text-slate-400 hover:text-slate-200 border-slate-800"
+                    ? "bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700 shadow-sm"
+                    : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border-slate-200 dark:border-slate-700"
                 }`}
               >
                 💻 Full-Stack Dev
@@ -187,10 +183,10 @@ export function HeroDropzone({ onProfileLoaded, activeProfile }: HeroDropzonePro
 
               <button
                 onClick={() => onProfileLoaded(SAMPLE_RESUMES.marcus_junior_ai)}
-                className={`px-2.5 py-1 rounded-md transition-all font-medium border ${
+                className={`px-2.5 py-1 rounded-lg transition-all font-semibold border ${
                   activeProfile.name === "Marcus Vance"
-                    ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40"
-                    : "bg-slate-900/80 text-slate-400 hover:text-slate-200 border-slate-800"
+                    ? "bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700 shadow-sm"
+                    : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border-slate-200 dark:border-slate-700"
                 }`}
               >
                 🤖 AI / ML
@@ -198,10 +194,10 @@ export function HeroDropzone({ onProfileLoaded, activeProfile }: HeroDropzonePro
 
               <button
                 onClick={() => onProfileLoaded(SAMPLE_RESUMES.elena_product_ops)}
-                className={`px-2.5 py-1 rounded-md transition-all font-medium border ${
+                className={`px-2.5 py-1 rounded-lg transition-all font-semibold border ${
                   activeProfile.name === "Elena Rostova"
-                    ? "bg-violet-500/20 text-violet-300 border-violet-500/40"
-                    : "bg-slate-900/80 text-slate-400 hover:text-slate-200 border-slate-800"
+                    ? "bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700 shadow-sm"
+                    : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border-slate-200 dark:border-slate-700"
                 }`}
               >
                 🎯 Product Mgr
@@ -213,13 +209,13 @@ export function HeroDropzone({ onProfileLoaded, activeProfile }: HeroDropzonePro
 
       {/* Paste Resume Text Modal */}
       {showPasteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="bg-obsidian-900 border border-slate-700 rounded-2xl w-full max-w-xl p-6 shadow-2xl relative">
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              <FileText className="w-5 h-5 text-emerald-400" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 dark:bg-black/80 backdrop-blur-md">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl w-full max-w-xl p-6 shadow-2xl relative">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               Paste Your Resume Content
             </h3>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               Copy and paste the plain text of your resume or LinkedIn profile below. Our parser will instantly extract skills, tools, and experience level.
             </p>
 
@@ -228,20 +224,20 @@ export function HeroDropzone({ onProfileLoaded, activeProfile }: HeroDropzonePro
               onChange={(e) => setPastedText(e.target.value)}
               placeholder="Paste resume summary, skills, and work experience here..."
               rows={8}
-              className="mt-4 w-full rounded-xl bg-obsidian-950 border border-slate-700/80 p-3 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-mono"
+              className="mt-4 w-full rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-3 text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 font-mono"
             />
 
             <div className="mt-4 flex items-center justify-end gap-2.5">
               <button
                 onClick={() => setShowPasteModal(false)}
-                className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white"
+                className="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white"
               >
                 Cancel
               </button>
               <button
                 onClick={handlePasteSubmit}
                 disabled={!pastedText.trim() || isProcessing}
-                className="px-5 py-2 text-xs font-semibold rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:brightness-110 disabled:opacity-50 transition-all shadow-glow"
+                className="px-5 py-2 text-xs font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 transition-all shadow-button"
               >
                 {isProcessing ? "Parsing..." : "Parse & Match Jobs"}
               </button>

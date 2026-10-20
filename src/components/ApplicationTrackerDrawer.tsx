@@ -80,37 +80,37 @@ export function ApplicationTrackerDrawer({
   const getStatusBadge = (status: ApplicationStatus) => {
     switch (status) {
       case "applied":
-        return { label: "Enrolled & Applied", bg: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30" };
+        return { label: "Enrolled & Applied", bg: "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/60" };
       case "under_review":
-        return { label: "Under Review", bg: "bg-cyan-500/10 text-cyan-400 border-cyan-500/30" };
+        return { label: "Under Review", bg: "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800/60" };
       case "interviewing":
-        return { label: "Interview Scheduled", bg: "bg-indigo-500/10 text-indigo-400 border-indigo-500/30" };
+        return { label: "Interview Scheduled", bg: "bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800/60" };
       case "offer_received":
-        return { label: "🎉 Offer Received!", bg: "bg-emerald-400/20 text-emerald-300 border-emerald-400/40" };
+        return { label: "🎉 Offer Received!", bg: "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/60 font-bold" };
       case "saved":
-        return { label: "Saved / Want to Apply", bg: "bg-slate-700/30 text-slate-300 border-slate-600/40" };
+        return { label: "Saved / Want to Apply", bg: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700" };
       case "rejected":
-        return { label: "Not Selected", bg: "bg-rose-500/10 text-rose-400 border-rose-500/30" };
+        return { label: "Not Selected", bg: "bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800/60" };
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-black/70 backdrop-blur-sm flex justify-end">
-      <div className="w-full max-w-xl bg-obsidian-950 border-l border-slate-800 h-full flex flex-col shadow-2xl animate-in slide-in-from-right duration-300">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-slate-900/60 dark:bg-black/70 backdrop-blur-sm flex justify-end">
+      <div className="w-full max-w-xl bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 h-full flex flex-col shadow-2xl animate-in slide-in-from-right duration-300">
         {/* Header */}
-        <div className="p-4 border-b border-slate-800 bg-obsidian-900 flex items-center justify-between">
+        <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-obsidian-950 shadow-glow">
-              <Briefcase className="w-5 h-5 text-obsidian-950" />
+            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-button">
+              <Briefcase className="w-5 h-5 text-white" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-white text-base">Application & Pipeline Hub</h3>
-                <span className="px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                <h3 className="font-bold text-[#183B56] dark:text-white text-base">Application & Pipeline Hub</h3>
+                <span className="px-2 py-0.5 rounded-full text-[10px] bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-bold border border-blue-200 dark:border-blue-800/60">
                   {applications.length} Tracked
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
                 Live log of all enrolled jobs, applications, and recruiter responses
               </p>
             </div>
@@ -120,15 +120,15 @@ export function ApplicationTrackerDrawer({
             <button
               onClick={onOpenComposioModal}
               title="Connect Greenhouse / Composio"
-              className="px-2.5 py-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-[11px] text-indigo-300 font-semibold flex items-center gap-1.5 transition-colors"
+              className="px-2.5 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 border border-indigo-200 dark:border-indigo-800/60 text-[11px] text-indigo-700 dark:text-indigo-300 font-semibold flex items-center gap-1.5 transition-colors"
             >
-              <RefreshCw className="w-3.5 h-3.5 text-indigo-400" />
+              <RefreshCw className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
               <span>Sync Greenhouse</span>
             </button>
 
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -136,73 +136,73 @@ export function ApplicationTrackerDrawer({
         </div>
 
         {/* Quick Metric Bar */}
-        <div className="grid grid-cols-4 border-b border-slate-800/80 bg-obsidian-950 divide-x divide-slate-800/80 text-center py-2.5 px-2">
+        <div className="grid grid-cols-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/40 divide-x divide-slate-200 dark:divide-slate-800 text-center py-2.5 px-2">
           <div>
-            <div className="text-base font-bold text-emerald-400">{totalApplied}</div>
-            <div className="text-[10px] text-slate-400 uppercase tracking-wider">Applied</div>
+            <div className="text-base font-bold text-emerald-600 dark:text-emerald-400">{totalApplied}</div>
+            <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">Applied</div>
           </div>
           <div>
-            <div className="text-base font-bold text-indigo-400">{totalInterviewing}</div>
-            <div className="text-[10px] text-slate-400 uppercase tracking-wider">Interviewing</div>
+            <div className="text-base font-bold text-blue-600 dark:text-blue-400">{totalInterviewing}</div>
+            <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">Interviewing</div>
           </div>
           <div>
-            <div className="text-base font-bold text-cyan-400">{totalSaved}</div>
-            <div className="text-[10px] text-slate-400 uppercase tracking-wider">Saved</div>
+            <div className="text-base font-bold text-cyan-600 dark:text-cyan-400">{totalSaved}</div>
+            <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">Saved</div>
           </div>
           <div>
-            <div className="text-base font-bold text-amber-400">{totalOffers}</div>
-            <div className="text-[10px] text-slate-400 uppercase tracking-wider">Offers</div>
+            <div className="text-base font-bold text-amber-600 dark:text-amber-400">{totalOffers}</div>
+            <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">Offers</div>
           </div>
         </div>
 
         {/* Status Filters */}
-        <div className="p-3 border-b border-slate-800 bg-obsidian-900/60 flex items-center gap-1.5 overflow-x-auto text-xs">
+        <div className="p-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60 flex items-center gap-1.5 overflow-x-auto text-xs">
           <button
             onClick={() => setFilter("all")}
-            className={`px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition-colors ${
+            className={`px-3 py-1.5 rounded-lg font-semibold whitespace-nowrap transition-colors ${
               filter === "all"
-                ? "bg-emerald-500 text-obsidian-950 font-bold shadow-glow"
-                : "bg-slate-900 text-slate-400 hover:text-white border border-slate-800"
+                ? "bg-blue-600 text-white shadow-button"
+                : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700"
             }`}
           >
             All ({applications.length})
           </button>
           <button
             onClick={() => setFilter("applied")}
-            className={`px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition-colors ${
+            className={`px-3 py-1.5 rounded-lg font-semibold whitespace-nowrap transition-colors ${
               filter === "applied"
-                ? "bg-emerald-500 text-obsidian-950 font-bold shadow-glow"
-                : "bg-slate-900 text-slate-400 hover:text-white border border-slate-800"
+                ? "bg-blue-600 text-white shadow-button"
+                : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700"
             }`}
           >
             Enrolled ({totalApplied})
           </button>
           <button
             onClick={() => setFilter("interviewing")}
-            className={`px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition-colors ${
+            className={`px-3 py-1.5 rounded-lg font-semibold whitespace-nowrap transition-colors ${
               filter === "interviewing"
-                ? "bg-indigo-500 text-white font-bold shadow-glow"
-                : "bg-slate-900 text-slate-400 hover:text-white border border-slate-800"
+                ? "bg-blue-600 text-white shadow-button"
+                : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700"
             }`}
           >
             Interviewing ({totalInterviewing})
           </button>
           <button
             onClick={() => setFilter("saved")}
-            className={`px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition-colors ${
+            className={`px-3 py-1.5 rounded-lg font-semibold whitespace-nowrap transition-colors ${
               filter === "saved"
-                ? "bg-cyan-500 text-obsidian-950 font-bold shadow-glow"
-                : "bg-slate-900 text-slate-400 hover:text-white border border-slate-800"
+                ? "bg-blue-600 text-white shadow-button"
+                : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700"
             }`}
           >
             Saved ({totalSaved})
           </button>
           <button
             onClick={() => setFilter("offers")}
-            className={`px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition-colors ${
+            className={`px-3 py-1.5 rounded-lg font-semibold whitespace-nowrap transition-colors ${
               filter === "offers"
-                ? "bg-amber-400 text-obsidian-950 font-bold shadow-glow"
-                : "bg-slate-900 text-slate-400 hover:text-white border border-slate-800"
+                ? "bg-blue-600 text-white shadow-button"
+                : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700"
             }`}
           >
             Offers ({totalOffers})
@@ -213,11 +213,11 @@ export function ApplicationTrackerDrawer({
         <div className="flex-1 overflow-y-auto p-4 space-y-3.5">
           {filteredApps.length === 0 ? (
             <div className="text-center py-16 px-4">
-              <div className="w-12 h-12 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto text-slate-500 mb-3">
+              <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center mx-auto text-slate-400 mb-3">
                 <Briefcase className="w-6 h-6" />
               </div>
-              <h4 className="text-sm font-semibold text-white">No jobs in this filter yet</h4>
-              <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
+              <h4 className="text-sm font-semibold text-[#183B56] dark:text-white">No jobs in this filter yet</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-xs mx-auto">
                 Click &quot;1-Click Enroll &amp; Apply&quot; on any job card to instantly log and track your applications here!
               </p>
             </div>
@@ -229,33 +229,33 @@ export function ApplicationTrackerDrawer({
               return (
                 <div
                   key={app.id}
-                  className="p-4 rounded-xl bg-obsidian-900 border border-slate-800/90 hover:border-slate-700 transition-all shadow-glass"
+                  className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all shadow-sm"
                 >
                   {/* Top Bar: Title, Company, Status Badge */}
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <div className="flex items-center gap-2">
-                        <h4 className="font-bold text-white text-sm hover:text-emerald-400 transition-colors">
+                        <h4 className="font-bold text-[#183B56] dark:text-white text-sm hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                           {app.jobTitle}
                         </h4>
-                        <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                        <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-800/60">
                           {app.matchScore}% Fit
                         </span>
                       </div>
-                      <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
-                        <span className="font-semibold text-slate-200 flex items-center gap-1">
+                      <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mt-1">
+                        <span className="font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1">
                           <Building className="w-3.5 h-3.5 text-slate-400" />
                           {app.company}
                         </span>
                         <span>•</span>
                         <span className="flex items-center gap-1 text-[11px]">
-                          <MapPin className="w-3 h-3 text-slate-500" />
+                          <MapPin className="w-3 h-3 text-slate-400" />
                           {app.location}
                         </span>
                         {app.salaryRange && (
                           <>
                             <span>•</span>
-                            <span className="text-emerald-400 font-semibold text-[11px]">
+                            <span className="text-emerald-600 dark:text-emerald-400 font-semibold text-[11px]">
                               {app.salaryRange}
                             </span>
                           </>
@@ -270,26 +270,26 @@ export function ApplicationTrackerDrawer({
                       aria-label="Application Status"
                       className={`text-[11px] font-bold px-2 py-1 rounded-lg border focus:outline-none transition-colors cursor-pointer ${badge.bg}`}
                     >
-                      <option value="applied" className="bg-obsidian-950 text-white">Enrolled &amp; Applied</option>
-                      <option value="under_review" className="bg-obsidian-950 text-white">Under Review</option>
-                      <option value="interviewing" className="bg-obsidian-950 text-white">Interview Scheduled</option>
-                      <option value="offer_received" className="bg-obsidian-950 text-white">🎉 Offer Received</option>
-                      <option value="saved" className="bg-obsidian-950 text-white">Saved / Want to Apply</option>
-                      <option value="rejected" className="bg-obsidian-950 text-white">Not Selected</option>
+                      <option value="applied" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Enrolled &amp; Applied</option>
+                      <option value="under_review" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Under Review</option>
+                      <option value="interviewing" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Interview Scheduled</option>
+                      <option value="offer_received" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">🎉 Offer Received</option>
+                      <option value="saved" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Saved / Want to Apply</option>
+                      <option value="rejected" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Not Selected</option>
                     </select>
                   </div>
 
                   {/* Recruiter Response & Notes Section */}
-                  <div className="mt-3 p-3 rounded-xl bg-obsidian-950/80 border border-slate-800/80 text-xs">
-                    <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1.5">
-                      <span className="font-semibold flex items-center gap-1 text-slate-300">
-                        <MessageSquare className="w-3 h-3 text-emerald-400" />
+                  <div className="mt-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-xs">
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mb-1.5">
+                      <span className="font-semibold flex items-center gap-1 text-[#183B56] dark:text-slate-300">
+                        <MessageSquare className="w-3 h-3 text-blue-600 dark:text-blue-400" />
                         <span>Recruiter Status &amp; Response:</span>
                       </span>
                       {!isEditing ? (
                         <button
                           onClick={() => handleStartEdit(app)}
-                          className="text-slate-400 hover:text-emerald-400 flex items-center gap-1 transition-colors"
+                          className="text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 flex items-center gap-1 transition-colors"
                         >
                           <Edit3 className="w-3 h-3" />
                           <span>Update</span>
@@ -297,7 +297,7 @@ export function ApplicationTrackerDrawer({
                       ) : (
                         <button
                           onClick={() => handleSaveEdit(app.id)}
-                          className="text-emerald-400 font-bold hover:underline flex items-center gap-1"
+                          className="text-blue-600 dark:text-blue-400 font-bold hover:underline flex items-center gap-1"
                         >
                           <Check className="w-3 h-3" />
                           <span>Save</span>
@@ -308,33 +308,33 @@ export function ApplicationTrackerDrawer({
                     {isEditing ? (
                       <div className="space-y-2 mt-2">
                         <div>
-                          <label className="text-[10px] text-slate-400 block mb-0.5">Recruiter Response:</label>
+                          <label className="text-[10px] text-slate-500 dark:text-slate-400 block mb-0.5">Recruiter Response:</label>
                           <input
                             type="text"
                             value={editResponse}
                             onChange={(e) => setEditResponse(e.target.value)}
                             placeholder="e.g. Email received from Greenhouse: 30min call scheduled"
-                            className="w-full px-2.5 py-1.5 rounded-lg bg-obsidian-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-emerald-500"
+                            className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-blue-500"
                           />
                         </div>
                         <div>
-                          <label className="text-[10px] text-slate-400 block mb-0.5">Next Steps &amp; Notes:</label>
+                          <label className="text-[10px] text-slate-500 dark:text-slate-400 block mb-0.5">Next Steps &amp; Notes:</label>
                           <textarea
                             value={editNotes}
                             onChange={(e) => setEditNotes(e.target.value)}
                             rows={2}
-                            placeholder="e.g. Prep SQL case studies with Aria AI"
-                            className="w-full px-2.5 py-1.5 rounded-lg bg-obsidian-900 border border-slate-700 text-white text-xs focus:outline-none focus:border-emerald-500 resize-none"
+                            placeholder="e.g. Prep SQL case studies with Zara AI"
+                            className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-blue-500 resize-none"
                           />
                         </div>
                       </div>
                     ) : (
                       <>
-                        <p className="text-slate-200 font-medium">
+                        <p className="text-slate-700 dark:text-slate-200 font-medium">
                           {app.recruiterResponse || "Application submitted; waiting for recruiter feedback."}
                         </p>
                         {app.notes && (
-                          <p className="text-slate-400 text-[11px] mt-1 italic">
+                          <p className="text-slate-500 dark:text-slate-400 text-[11px] mt-1 italic">
                             &quot;{app.notes}&quot;
                           </p>
                         )}
@@ -343,20 +343,20 @@ export function ApplicationTrackerDrawer({
                   </div>
 
                   {/* Footer Meta & Actions */}
-                  <div className="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+                  <div className="mt-3 pt-2.5 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
                     <div className="flex items-center gap-2">
                       <span>Applied: {app.appliedAt}</span>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      {/* Ask Aria AI about this application */}
+                      {/* Ask Zara AI about this application */}
                       <button
                         onClick={() => onAskAriaAboutJob(app.jobTitle, app.company, app.status)}
-                        className="px-2.5 py-1 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30 flex items-center gap-1 transition-colors"
-                        title="Get interview prep or follow-up email from Aria"
+                        className="px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-semibold border border-blue-200 dark:border-blue-800/60 flex items-center gap-1 transition-colors"
+                        title="Get interview prep or follow-up email from Zara"
                       >
-                        <Sparkles className="w-3 h-3 text-indigo-400" />
-                        <span>Prep with Aria</span>
+                        <Sparkles className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                        <span>Prep with Zara</span>
                       </button>
 
                       {/* Direct Apply / Job Portal Link */}
@@ -364,7 +364,7 @@ export function ApplicationTrackerDrawer({
                         href={app.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
+                        className="p-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
                         title="Open Official Job Application Link"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
@@ -373,7 +373,7 @@ export function ApplicationTrackerDrawer({
                       {/* Delete */}
                       <button
                         onClick={() => onRemove(app.id)}
-                        className="p-1 rounded-lg hover:bg-rose-950/40 text-slate-500 hover:text-rose-400 transition-colors"
+                        className="p-1 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors"
                         title="Remove from tracker"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
