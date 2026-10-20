@@ -106,14 +106,18 @@ export function generateContextualAiResponse(
       p.includes("missing") ||
       p.includes("gap") ||
       p.includes("need to learn") ||
+      p.includes("should i learn") ||
+      p.includes("skills to learn") ||
       p.includes("what am i missing") ||
       p.includes("what do i not have") ||
       p.includes("skills needed") ||
       p.includes("skills required") ||
+      p.includes("skills do i need") ||
       p.includes("why am i not getting") ||
       p.includes("why am i rejected")) &&
     !p.includes("what if i didn't have") &&
-    !p.includes("what if i dont have");
+    !p.includes("what if i dont have") &&
+    !p.includes("what if i don't have");
 
   if (isAskingForMissingSkills) {
     // Gather all missing skills from 1-skill unlocks and top market matches
@@ -145,7 +149,7 @@ However, to unlock senior-tier and high-paying new offers (**$140k–$180k+ / �
 - **Impact Level:** **Critical Gatekeeper (Dealbreaker)**
 - **Why You're Missing It:** Modern hiring committees no longer hire for isolated ad-hoc scripting; they require automated, cloud-native pipelines.
 - **Roles Blocked Without It:** ${topUnlock?.targetRole || "Senior Data Analyst / Analytics Engineer"} roles at firms like ${topJob?.company || "top tech companies"}.
-- **Salary Boost When Acquired:** **+${topUnlock?.salaryBoostPercent || 35}% higher compensation** ($${topUnlock?.targetSalaryUsd || "145,000"}).
+- **Salary Boost When Acquired:** **+${topUnlock?.salaryBoostPercent || 35}% higher compensation** (${topUnlock?.unlockedEstimatedSalary ? `$${topUnlock.unlockedEstimatedSalary.toLocaleString()}` : "$145,000"}).
 - **Estimated Time to Bridge:** **${topUnlock?.bridgePlan?.estimatedTimeToLearn || "3 to 4 weeks"}** (~6 hrs/week).
 
 ${secondaryMissing.length > 0 ? `#### ⚠️ 2. Secondary High-Demand Skills You Lack:
@@ -228,14 +232,26 @@ Would you like me to generate the exact weekly curriculum and code template for 
       }
     ];
 
-    const jobsFormatted = unlocks.map((u, i) => `
+    const jobsFormatted = unlocks.map((u, i) => {
+      const uAny = u as Record<string, unknown>;
+      const currentFit = typeof uAny.currentMatchPercent === "number" ? uAny.currentMatchPercent : 82;
+      const potentialFit = typeof uAny.potentialMatchPercent === "number" ? uAny.potentialMatchPercent : 96;
+      const targetSalary = typeof uAny.targetSalaryUsd === "string" 
+        ? uAny.targetSalaryUsd 
+        : (typeof uAny.unlockedEstimatedSalary === "number" ? `$${uAny.unlockedEstimatedSalary.toLocaleString()}` : "$150,000");
+      return `
 #### ${i + 1}. **${u.targetRole}**
-- 🎯 **Current Fit:** \`${u.currentMatchPercent}%\` ➔ **Fit After 1 Skill:** \`${u.potentialMatchPercent}%\` (Top 5% Applicant)
+- 🎯 **Current Fit:** \`${currentFit}%\` ➔ **Fit After 1 Skill:** \`${potentialFit}%\` (Top 5% Applicant)
 - 🔑 **The 1 Missing Skill to Bridge:** **${u.missingSkills.join(" & ")}**
-- 💰 **Salary Package:** **${u.targetSalaryUsd}** (a **+${u.salaryBoostPercent}% pay increase**)
+- 💰 **Salary Package:** **${targetSalary}** (a **+${u.salaryBoostPercent}% pay increase**)
 - ⏱️ **Time to Learn:** ~${u.bridgePlan.estimatedTimeToLearn}
 - 🛠️ **Proof Project to Build:** *${u.bridgePlan.portfolioProject.title}*
-`).join("\n---");
+`;
+    }).join("\n---");
+
+    const firstAny = unlocks[0] as Record<string, unknown>;
+    const firstCurrent = typeof firstAny.currentMatchPercent === "number" ? firstAny.currentMatchPercent : 82;
+    const firstPotential = typeof firstAny.potentialMatchPercent === "number" ? firstAny.potentialMatchPercent : 96;
 
     return `### 🚀 Jobs That Are Only 1 Skill Away From You
 
@@ -248,7 +264,7 @@ ${jobsFormatted}
 ---
 
 ### 📊 Strategic Recommendation:
-Your fastest return on investment is targeting **${unlocks[0].targetRole}**. By learning **${unlocks[0].missingSkills[0]}**, your application score jumps from **${unlocks[0].currentMatchPercent}% to ${unlocks[0].potentialMatchPercent}%**, moving you into direct recruiter review!
+Your fastest return on investment is targeting **${unlocks[0].targetRole}**. By learning **${unlocks[0].missingSkills[0]}**, your application score jumps from **${firstCurrent}% to ${firstPotential}%**, moving you into direct recruiter review!
 
 Would you like me to create the step-by-step project guide for **${unlocks[0].missingSkills[0]}**?`;
   }
@@ -263,8 +279,9 @@ Would you like me to create the step-by-step project guide for **${unlocks[0].mi
       p.includes("what if i learn") ||
       p.includes("what if i know") ||
       p.includes("what if i master") ||
-      (p.includes("if i have") && (p.includes("would") || p.includes("can") || p.includes("job") || p.includes("get"))) ||
-      (p.includes("if i learn") && (p.includes("would") || p.includes("can") || p.includes("job") || p.includes("get"))));
+      (p.includes("if i have") && (p.includes("would") || p.includes("can") || p.includes("job") || p.includes("get") || p.includes("hire"))) ||
+      (p.includes("if i learn") && (p.includes("would") || p.includes("can") || p.includes("job") || p.includes("get") || p.includes("hire"))) ||
+      (p.includes("if i know") && (p.includes("would") || p.includes("can") || p.includes("job") || p.includes("get") || p.includes("hire"))));
 
   if (isHypotheticalHave) {
     const testedSkill = extractSkillFromPrompt(prompt) || "Cloud Architecture & Modern Tooling";
@@ -309,10 +326,11 @@ Would you like me to design a 2-week quick-start project so you can legitimately
     p.includes("what if i don't have") ||
     p.includes("what if i dont have") ||
     p.includes("what if i didn't have") ||
-    p.includes("can i get.*without") ||
-    p.includes("without having") ||
-    p.includes("is.*mandatory") ||
-    p.includes("is.*required");
+    p.includes("without") ||
+    p.includes("mandatory") ||
+    p.includes("is required") ||
+    /can i get .* without/i.test(p) ||
+    /is .* mandatory/i.test(p);
 
   if (isHypotheticalLack) {
     const testedSkill = extractSkillFromPrompt(prompt) || "Cloud Data Warehousing";
@@ -507,7 +525,7 @@ What would you like to explore today?`;
   // =========================================================================
   // PRIORITY 10: INTERVIEW QUESTIONS & PREPARATION
   // =========================================================================
-  if (p.includes("interview") || p.includes("questions hiring managers ask") || p.includes("mock") || p.includes("behavioral")) {
+  if (p.includes("interview") || p.includes("question") || p.includes("hiring manager") || p.includes("mock") || p.includes("behavioral")) {
     const role = jobMatches[0]?.title || profile.title;
     return `### 🎯 High-Frequency Interview Questions for **${role}**
 
