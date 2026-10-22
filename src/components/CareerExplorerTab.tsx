@@ -121,7 +121,7 @@ export function CareerExplorerTab({
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-700/60 text-xs font-semibold mb-2 shadow-sm">
               <Compass className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-              <span>CCBP Career Blueprint Explorer</span>
+              <span>Interactive Career Blueprint Explorer</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
               The "Become Anything" Hub
@@ -251,10 +251,10 @@ export function CareerExplorerTab({
         </div>
 
         {/* Sub-tabs: Bento Sections */}
-        <div className="mt-6 flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3 text-xs">
+        <div className="mt-6 flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3 text-xs overflow-x-auto">
           <button
             onClick={() => setActiveTab("overview")}
-            className={`px-3.5 py-1.5 rounded-lg font-semibold transition-all ${
+            className={`px-3.5 py-1.5 rounded-lg font-semibold transition-all whitespace-nowrap shrink-0 ${
               activeTab === "overview"
                 ? "bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-slate-700 shadow-sm"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
@@ -264,7 +264,7 @@ export function CareerExplorerTab({
           </button>
           <button
             onClick={() => setActiveTab("tech")}
-            className={`px-3.5 py-1.5 rounded-lg font-semibold transition-all ${
+            className={`px-3.5 py-1.5 rounded-lg font-semibold transition-all whitespace-nowrap shrink-0 ${
               activeTab === "tech"
                 ? "bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-slate-700 shadow-sm"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
@@ -274,7 +274,7 @@ export function CareerExplorerTab({
           </button>
           <button
             onClick={() => setActiveTab("roadmap")}
-            className={`px-3.5 py-1.5 rounded-lg font-semibold transition-all ${
+            className={`px-3.5 py-1.5 rounded-lg font-semibold transition-all whitespace-nowrap shrink-0 ${
               activeTab === "roadmap"
                 ? "bg-blue-50 dark:bg-slate-800 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-slate-700 shadow-sm"
                 : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"

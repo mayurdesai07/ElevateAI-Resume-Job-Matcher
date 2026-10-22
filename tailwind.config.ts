@@ -12,11 +12,11 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
-        // NxtWave CCBP 4.0 Design Tokens
-        ccbp: {
+        // Elevate Brand Design Tokens
+        brand: {
           primary: "var(--color-primary)",
           "primary-hover": "var(--color-primary-hover)",
-          blue: "var(--color-ccbp-blue)",
+          blue: "var(--color-brand-blue)",
           green: "var(--color-accent-green)",
           amber: "var(--color-accent-amber)",
           navy: "var(--bg-navy)",
@@ -43,12 +43,12 @@ const config: Config = {
           700: "#27334D",
         },
         emerald: {
-          400: "#44C654", // NxtWave CCBP vibrant green
+          400: "#44C654", // Vibrant brand success green
           500: "#36A844",
           600: "#2B8736",
         },
         cyan: {
-          400: "#0B69FF", // CCBP electric blue
+          400: "#0B69FF", // Electric accent blue
           500: "#2563EB",
         },
         indigo: {

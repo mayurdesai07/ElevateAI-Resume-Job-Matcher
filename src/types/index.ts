@@ -1,3 +1,13 @@
+export interface ResumeValidationResult {
+  isValid: boolean;
+  rejectionReason?: "transit_ticket" | "invoice_receipt" | "academic_paper" | "unreadable_binary" | "too_short" | "no_skills" | "lacks_structure" | "garbage";
+  userFriendlyMessage?: string;
+  detectedType?: "resume" | "transit_ticket" | "invoice_receipt" | "academic_paper" | "unreadable_binary" | "too_short" | "garbage";
+  confidenceScore: number; // 0 to 100
+  detectedSections: string[];
+  detectedSkills: string[];
+}
+
 export interface ResumeProfile {
   name: string;
   title: string;

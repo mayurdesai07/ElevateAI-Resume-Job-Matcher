@@ -7,14 +7,14 @@
 
 ## 🌟 Overview
 
-**ElevateAI** is a high-performance career intelligence platform and resume job matcher built with Next.js 14, Tailwind CSS, and the **NxtWave (CCBP 4.0) Design System**. It bridges the gap between candidates and high-paying roles through real-time ATS matching, 1-Skill Unlock diagnostics, and **Zara**, an autonomous Voice Career Strategist.
+**ElevateAI** is a high-performance career intelligence platform and resume job matcher built with Next.js 14 and Tailwind CSS. It bridges the gap between candidates and high-paying roles through real-time ATS matching, 1-Skill Unlock diagnostics, and **Zara**, an autonomous Voice Career Strategist.
 
 ---
 
 ## ✨ Key Features
 
-1. **NxtWave (CCBP 4.0) Design System & Light / Dark Mode:**
-   - Strict CCBP color tokens (`#2563EB` primary, `#183B56` navy headings, `#44C654` vibrant success green).
+1. **Light / Dark Mode Theme Engine:**
+   - High-contrast visual tokens (`#2563EB` primary, `#183B56` navy headings, `#44C654` vibrant success green).
    - 1-Click Sun ☀️ / Moon 🌙 Theme Engine with instant `localStorage` persistence and anti-flash rendering.
 
 2. **Automated Resume Parsing & Permanent Memory:**
@@ -47,7 +47,7 @@
 ## 🛠️ Tech Stack
 
 - **Framework:** Next.js 14 (App Router & Serverless Functions)
-- **Styling:** Tailwind CSS + NxtWave (CCBP 4.0) Design Tokens
+- **Styling:** Tailwind CSS + Semantic Design Tokens
 - **Icons:** Lucide React
 - **Voice AI:** Web Speech Recognition & SpeechSynthesis Engine
 - **Hosting & Edge Delivery:** Vercel Global Edge Network

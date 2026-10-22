@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://elevate-your-career.vercel.app"),
-  title: "ElevateAI — NxtWave (CCBP 4.0) Intelligent Resume Job Matcher",
+  title: "ElevateAI — Intelligent Resume Job Matcher & Career Studio",
   description:
     "Find jobs fitted to your resume, discover the exact single skill holding you back from a 35%+ salary boost, explore step-by-step career blueprints, and get guided by an autonomous AI Career Coach.",
   openGraph: {
@@ -40,7 +40,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="bg-surface-secondary text-ccbp-body antialiased min-h-screen">
+      <body className="bg-surface-secondary text-slate-700 dark:text-slate-300 antialiased min-h-screen overflow-x-hidden">
         {children}
       </body>
     </html>

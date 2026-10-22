@@ -17,7 +17,7 @@ export function OneSkillUnlockTab({
 }: OneSkillUnlockTabProps) {
   return (
     <div className="space-y-8">
-      {/* NxtWave CCBP High-ROI Headline Banner */}
+      {/* High-ROI Headline Banner */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-50 via-indigo-50/50 to-amber-50/50 dark:from-slate-900 dark:via-blue-950/30 dark:to-slate-900 border border-blue-200 dark:border-slate-800 p-6 shadow-card transition-colors duration-200">
         <div className="max-w-3xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-700/60 text-xs font-bold mb-3 shadow-sm">
@@ -46,7 +46,7 @@ export function OneSkillUnlockTab({
           return (
             <div
               key={unlock.id}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 rounded-2xl p-6 shadow-card ccbp-card-hover transition-all"
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 rounded-2xl p-6 shadow-card elevate-card-hover transition-all"
             >
               {/* Card Header: Target Role & Salary Boost Badge */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">

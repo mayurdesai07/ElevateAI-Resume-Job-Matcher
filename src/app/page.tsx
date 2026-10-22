@@ -157,7 +157,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-secondary text-ccbp-body flex flex-col selection:bg-blue-600 selection:text-white transition-colors duration-200">
+    <div className="min-h-screen bg-surface-secondary text-slate-700 dark:text-slate-300 flex flex-col selection:bg-blue-600 selection:text-white transition-colors duration-200 overflow-x-hidden">
       {/* Top Navigation */}
       <Navbar
         activeTab={activeTab}
@@ -306,15 +306,15 @@ export default function Home() {
       )}
 
       {/* Persistent Floating AI Action Button (Bottom Right) */}
-      <aside aria-label="Quick Actions" className="fixed bottom-6 right-6 z-40 flex items-center gap-2">
+      <aside aria-label="Quick Actions" className="fixed bottom-4 right-3 sm:bottom-6 sm:right-6 z-40 flex items-center gap-1.5 sm:gap-2">
         <button
           onClick={() => setIsTrackerDrawerOpen(true)}
-          className="flex items-center gap-2 px-3.5 py-3 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-white font-bold text-xs border border-slate-200 dark:border-slate-700 shadow-md transition-all hover:scale-105"
+          className="flex items-center gap-1 px-2.5 py-2 sm:px-3.5 sm:py-3 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-white font-bold text-xs border border-slate-200 dark:border-slate-700 shadow-md transition-all hover:scale-105"
           title="Open Application Tracker"
         >
-          <span>📋 Tracker</span>
+          <span>📋 <span className="hidden sm:inline">Tracker</span></span>
           {applications.length > 0 && (
-            <span className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black text-[10px]">
+            <span className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black text-[9px] sm:text-[10px]">
               {applications.length}
             </span>
           )}
@@ -325,9 +325,9 @@ export default function Home() {
             setInjectedAiPrompt("");
             setIsAiDrawerOpen(true);
           }}
-          className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 hover:scale-105 text-white font-bold text-xs shadow-button transition-all"
+          className="flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-3 rounded-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 hover:scale-105 text-white font-bold text-xs shadow-button transition-all"
         >
-          <Sparkles className="w-4 h-4 text-blue-200 animate-pulse" />
+          <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-200 animate-pulse" />
           <span>Ask Zara AI</span>
         </button>
       </aside>
@@ -337,7 +337,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="font-bold text-slate-900 dark:text-white">ElevateAI</span>
-            <span>— NxtWave (CCBP 4.0) Intelligent Resume Job Matcher</span>
+            <span>— Autonomous Resume Job Matcher &amp; Career Studio</span>
           </div>
           <div className="flex items-center gap-4 text-slate-500 dark:text-slate-400">
             <span>Live Job Feeds (Jobicy &amp; Greenhouse)</span>

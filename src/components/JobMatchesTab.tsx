@@ -337,7 +337,7 @@ export function JobMatchesTab({
           return (
             <div
               key={job.id}
-              className={`bg-white dark:bg-slate-900 border rounded-2xl p-5 shadow-card ccbp-card-hover flex flex-col justify-between transition-all ${
+              className={`bg-white dark:bg-slate-900 border rounded-2xl p-5 shadow-card elevate-card-hover flex flex-col justify-between transition-all ${
                 enrolled
                   ? "border-emerald-400 bg-emerald-50/20 dark:bg-emerald-950/20 opacity-90"
                   : job.isNew
@@ -348,7 +348,7 @@ export function JobMatchesTab({
               <div>
                 {/* Top Row: Title, Fresh Badge, Company Details & Circular Percentage Ring */}
                 <div className="flex items-start justify-between gap-3">
-                  <div className="space-y-1.5 flex-1">
+                  <div className="space-y-1.5 flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h3 className="font-bold text-base text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                         {job.title}
